@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "987686096589",
+    "project_id": "yarisma-app-315e7",
+    "storage_bucket": "yarisma-app-315e7.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987686096589:android:f97ffd4981bff74b0be384",
+        "android_client_info": {
+          "package_name": "com.ergulburak.yarisma"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "987686096589-r98f11cr1bupj4knjg5aa4880m24son9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDtw1AQSmtV-r2NMQwxpHraACJ8TUukjIM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987686096589-r98f11cr1bupj4knjg5aa4880m24son9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
