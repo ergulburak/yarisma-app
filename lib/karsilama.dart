@@ -1,11 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yarisma_app/Entities/user_data.dart';
 import 'package:yarisma_app/Services/authServices.dart';
 import 'package:yarisma_app/home_page.dart';
 import 'Services/hexToColor.dart' as HexColor;
+import 'package:yarisma_app/Services/globals.dart' as globals;
 
 class Karsilama extends StatefulWidget {
   @override
@@ -17,7 +20,7 @@ class _KarsilamaState extends State<Karsilama> {
   @override
   void initState() {
     super.initState();
-    // _handleStartScreen();
+    CollectionReference users = FirebaseFirestore.instance.collection('users');
     FirebaseAuth.instance.authStateChanges().listen((firebaseUser) {
       if (firebaseUser == null) {
         print("Oturum kapalı");
@@ -25,24 +28,16 @@ class _KarsilamaState extends State<Karsilama> {
             () => Navigator.pushNamed(context, "/login"));
       } else {
         print(firebaseUser.displayName);
-        Future.delayed(const Duration(seconds: 2),
-            () => Navigator.pushNamed(context, "/home", arguments: _auth));
+        users.where("uid", isEqualTo: firebaseUser.uid).get().then((value) {
+          globals.userData = new UserData.fromJson(value.docs.first.data()!);
+          globals.userCollectionID = value.docs.first.reference.id;
+          Future.delayed(const Duration(seconds: 2),
+              () => Navigator.pushNamed(context, "/home", arguments: _auth));
+        });
       }
     });
   }
 
-  /*Future<void> _handleStartScreen() async {
-    AuthService _auth = AuthService();
-    if (await _auth.isLoggedIn()) {
-      print("Oturum açık"+_auth.getUser()!);
-      Future.delayed(const Duration(seconds: 2),
-          () => Navigator.pushNamed(context, "/home"));
-    } else {
-      print("Oturum kapalı");
-      Future.delayed(const Duration(seconds: 2),
-          () => Navigator.pushNamed(context, "/login"));
-    }
-  }*/
   @override
   Widget build(BuildContext context) {
     TextStyle _googleFonts = GoogleFonts.robotoMono(

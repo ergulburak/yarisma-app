@@ -1,14 +1,18 @@
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Services/date_utils.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/hexToColor.dart';
 import 'Services/authServices.dart' as authServices;
 import 'Services/globals.dart' as globals;
+import 'package:yarisma_app/Services/date_utils.dart' as dataUtils;
 
-enum Screens { HOME, PROFIL, LEADERBOARD }
+enum Screens { HOME, PROFIL, LEADERBOARD, PANEL }
 
 class HomePage extends StatefulWidget {
   HomePage({required this.auth});
@@ -20,9 +24,15 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   TextStyle _textStyle = AppFont().getAppFont();
   Screens _screens = Screens.HOME;
+  late UserData _userData;
   @override
   void initState() {
     super.initState();
+    setUserData();
+  }
+
+  setUserData() {
+    _userData = globals.userData!;
   }
 
   sayfa(BuildContext context) {
@@ -30,217 +40,251 @@ class _HomePageState extends State<HomePage> {
       return home(context);
     else if (_screens == Screens.PROFIL)
       return profil(context);
-    else if (_screens == Screens.LEADERBOARD) return leaderBoard(context);
+    else if (_screens == Screens.LEADERBOARD)
+      return leaderBoard(context);
+    else if (_screens == Screens.PANEL) return panel(context);
   }
 
+  DocumentReference users = FirebaseFirestore.instance
+      .collection('users')
+      .doc(globals.userCollectionID);
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async => showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: Text('Uyarı'),
-          content: Text('Uygulamayı kapatmak istediğine emin misin?'),
-          actions: [
-            TextButton(
-              child: Text('Evet'),
-              onPressed: () {
-                SystemNavigator.pop();
-              },
+    return StreamBuilder<DocumentSnapshot>(
+      stream: users.snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasData) {
+          globals.userData = UserData.fromFirestore(snapshot.data!);
+          setUserData();
+        }
+        return WillPopScope(
+          onWillPop: () async => showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: Text('Uyarı'),
+              content: Text('Uygulamayı kapatmak istediğine emin misin?'),
+              actions: [
+                TextButton(
+                  child: Text('Evet'),
+                  onPressed: () {
+                    SystemNavigator.pop();
+                  },
+                ),
+                TextButton(
+                  child: Text('Hayır'),
+                  onPressed: () => Navigator.pop(c, false),
+                ),
+              ],
             ),
-            TextButton(
-              child: Text('Hayır'),
-              onPressed: () => Navigator.pop(c, false),
-            ),
-          ],
-        ),
-      ).then((value) => value ?? false),
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            FlareActor(
-              "assets/Cosmos.flr",
-              alignment: Alignment.center,
-              fit: BoxFit.cover,
-              animation: 'idle',
-            ),
-            SafeArea(
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                  child: Container(
-                    height: 80,
-                    width: globals.telefonWidth,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(
-                            authServices.AuthService().getUser() ?? "---",
-                            style: _textStyle.apply(fontSizeDelta: 25),
-                          ),
-                        ),
-                        FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text("PUAN",
-                                      style:
-                                          _textStyle.apply(fontSizeDelta: -2)),
-                                  Text(
-                                    "999",
-                                    style: _textStyle.apply(
-                                      fontSizeDelta: 5,
-                                      color: HexColor().getColor("#03fcc2"),
-                                      shadows: [
-                                        Shadow(
-                                          color: Colors.black,
-                                          offset: Offset(0, 0),
-                                          blurRadius: 5,
-                                        ),
-                                        Shadow(
-                                          color: Colors.black,
-                                          offset: Offset(0, 0),
-                                          blurRadius: 10,
-                                        ),
-                                        Shadow(
-                                          color: Colors.black,
-                                          offset: Offset(0, 0),
-                                          blurRadius: 3,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
+          ).then((value) => value ?? false),
+          child: Scaffold(
+            backgroundColor: Colors.black,
+            body: Stack(
+              children: [
+                FlareActor(
+                  "assets/Cosmos.flr",
+                  alignment: Alignment.center,
+                  fit: BoxFit.cover,
+                  animation: 'idle',
+                ),
+                SafeArea(
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                      child: Container(
+                        height: 80,
+                        width: globals.telefonWidth,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                authServices.AuthService().getUser() ?? "---",
+                                style: _textStyle.apply(fontSizeDelta: 25),
                               ),
                             ),
-                          ),
-                        )
-                      ],
+                            FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Padding(
+                                padding: EdgeInsets.only(right: 10),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text("PUAN",
+                                          style: _textStyle.apply(
+                                              fontSizeDelta: -2)),
+                                      Text(
+                                        _userData.totalScore.toString(),
+                                        style: _textStyle.apply(
+                                          fontSizeDelta: 5,
+                                          color: HexColor().getColor("#03fcc2"),
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black,
+                                              offset: Offset(0, 0),
+                                              blurRadius: 5,
+                                            ),
+                                            Shadow(
+                                              color: Colors.black,
+                                              offset: Offset(0, 0),
+                                              blurRadius: 10,
+                                            ),
+                                            Shadow(
+                                              color: Colors.black,
+                                              offset: Offset(0, 0),
+                                              blurRadius: 3,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.all(20),
-              child: Align(
-                alignment: Alignment.bottomRight,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.menu,
-                    color: Colors.white,
-                  ),
-                  alignment: Alignment.center,
-                  iconSize: 40,
-                  onPressed: () {
-                    showAdaptiveActionSheet(
-                      context: context,
-                      title: const Text('Title'),
-                      actions: <BottomSheetAction>[
-                        BottomSheetAction(
-                          title: Text(
-                            'Anasayfa',
-                            style: _textStyle,
-                          ),
-                          onPressed: () {
-                            _screens = Screens.HOME;
-                            setState(() {});
-                            Navigator.pop(context, false);
-                          },
-                          leading: const Icon(
-                            Icons.home,
-                            size: 25,
-                            color: Colors.white,
-                          ),
-                        ),
-                        BottomSheetAction(
-                          title: Text(
-                            'Profil',
-                            style: _textStyle,
-                          ),
-                          onPressed: () {
-                            _screens = Screens.PROFIL;
-                            setState(() {});
-                            Navigator.pop(context, false);
-                          },
-                          leading: const Icon(
-                            Icons.portrait,
-                            size: 25,
-                            color: Colors.white,
-                          ),
-                        ),
-                        BottomSheetAction(
-                          title: Text(
-                            'Lider Tablosu',
-                            style: _textStyle,
-                          ),
-                          onPressed: () {
-                            _screens = Screens.LEADERBOARD;
-                            setState(() {});
-                            Navigator.pop(context, false);
-                          },
-                          leading: const Icon(
-                            Icons.leaderboard,
-                            size: 25,
-                            color: Colors.white,
-                          ),
-                        ),
-                        BottomSheetAction(
-                          title: Text(
-                            'Çıkış Yap',
-                            style: _textStyle,
-                          ),
-                          onPressed: () {
-                            showDialog(
-                              context: context,
-                              builder: (c) => AlertDialog(
-                                title: Text('Uyarı'),
-                                content:
-                                    Text('Çıkış yapmak istediğine emin misin?'),
-                                actions: [
-                                  TextButton(
-                                    child: Text('Evet'),
-                                    onPressed: () {
-                                      authServices.AuthService().signOut();
-                                      Navigator.pop(context, false);
-                                      Navigator.pushNamed(context, '/login');
-                                    },
-                                  ),
-                                  TextButton(
-                                    child: Text('Hayır'),
-                                    onPressed: () => Navigator.pop(c, false),
-                                  ),
-                                ],
+                Padding(
+                  padding: EdgeInsets.all(20),
+                  child: Align(
+                    alignment: Alignment.bottomRight,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.menu,
+                        color: Colors.white,
+                      ),
+                      alignment: Alignment.center,
+                      iconSize: 40,
+                      onPressed: () {
+                        showAdaptiveActionSheet(
+                          context: context,
+                          title: const Text('Title'),
+                          actions: <BottomSheetAction>[
+                            if (globals.userData!.rank=="moderator") BottomSheetAction(
+                              title: Text(
+                                'Panel',
+                                style: _textStyle,
                               ),
-                            ).then((value) => value ?? false);
-                          },
-                          leading: const Icon(
-                            Icons.exit_to_app,
-                            size: 25,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ],
-                    );
-                  },
+                              onPressed: () {
+                                _screens = Screens.PANEL;
+                                setState(() {});
+                                Navigator.pop(context, false);
+                              },
+                              leading: const Icon(
+                                Icons.settings_applications_sharp,
+                                size: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            BottomSheetAction(
+                              title: Text(
+                                'Anasayfa',
+                                style: _textStyle,
+                              ),
+                              onPressed: () {
+                                _screens = Screens.HOME;
+                                setState(() {});
+                                Navigator.pop(context, false);
+                              },
+                              leading: const Icon(
+                                Icons.home,
+                                size: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            BottomSheetAction(
+                              title: Text(
+                                'Profil',
+                                style: _textStyle,
+                              ),
+                              onPressed: () {
+                                _screens = Screens.PROFIL;
+                                setState(() {});
+                                Navigator.pop(context, false);
+                              },
+                              leading: const Icon(
+                                Icons.portrait,
+                                size: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            BottomSheetAction(
+                              title: Text(
+                                'Lider Tablosu',
+                                style: _textStyle,
+                              ),
+                              onPressed: () {
+                                _screens = Screens.LEADERBOARD;
+                                setState(() {});
+                                Navigator.pop(context, false);
+                              },
+                              leading: const Icon(
+                                Icons.leaderboard,
+                                size: 25,
+                                color: Colors.white,
+                              ),
+                            ),
+                            BottomSheetAction(
+                              title: Text(
+                                'Çıkış Yap',
+                                style: _textStyle,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (c) => AlertDialog(
+                                    title: Text('Uyarı'),
+                                    content: Text(
+                                        'Çıkış yapmak istediğine emin misin?'),
+                                    actions: [
+                                      TextButton(
+                                        child: Text('Evet'),
+                                        onPressed: () {
+                                          authServices.AuthService().signOut();
+                                          Navigator.pop(context, false);
+                                          Navigator.pushNamed(
+                                              context, '/login');
+                                        },
+                                      ),
+                                      TextButton(
+                                        child: Text('Hayır'),
+                                        onPressed: () =>
+                                            Navigator.pop(c, false),
+                                      ),
+                                    ],
+                                  ),
+                                ).then((value) => value ?? false);
+                              },
+                              leading: const Icon(
+                                Icons.exit_to_app,
+                                size: 25,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
                 ),
-              ),
+                sayfa(context),
+              ],
             ),
-            sayfa(context),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -255,7 +299,7 @@ class _HomePageState extends State<HomePage> {
         animation: 'verified',
         callback: (name) {
           if (name == "verified") {
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           }
         },
       ),
@@ -273,7 +317,7 @@ class _HomePageState extends State<HomePage> {
         animation: 'verified',
         callback: (name) {
           if (name == "verified") {
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           }
         },
       ),
@@ -291,9 +335,31 @@ class _HomePageState extends State<HomePage> {
         animation: 'go',
         callback: (name) {
           if (name == "go") {
-            Navigator.pop(context,false);
+            Navigator.pop(context, false);
           }
         },
+      ),
+    );
+  }
+
+  List weekNum() {
+    List weekNumbers=<String>[];
+    for (int i = 0; i < 53; i++) {
+      if (i >= dataUtils.DateUtils.currentWeek()) weekNumbers.add("Week " + i.toString());
+    }
+    return weekNumbers;
+  }
+
+  String _dropdownValue="One";
+  Widget panel(BuildContext context) {
+    return Container(
+      width: globals.telefonWidth,
+      height: globals.telefonHeight,
+      child: DropdownButton(
+        value: "_dropdownValue",
+        items: weekNum().map<DropdownMenuItem<String>>((e) {
+          return DropdownMenuItem<String>(child: Text(e.toString()), value: e);
+        }).toList(),
       ),
     );
   }
@@ -524,7 +590,7 @@ class _HomePageState extends State<HomePage> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "50/50 Joker sayın: 0",
+                          "50/50 Joker sayın: " + _userData.joker.toString(),
                           style: _textStyle.apply(
                             fontSizeDelta: 5,
                             shadows: [
@@ -570,7 +636,7 @@ class _HomePageState extends State<HomePage> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Giriş Bileti: 0",
+                          "Giriş Bileti: " + _userData.tickets.toString(),
                           style: _textStyle.apply(
                             fontSizeDelta: 5,
                             shadows: [
@@ -600,7 +666,7 @@ class _HomePageState extends State<HomePage> {
                         child: Column(
                           children: [
                             Text(
-                              "0/3",
+                              _userData.ticketAdCounter.toString() + "/3",
                               style: _textStyle.apply(fontSizeDelta: -5),
                             ),
                             Icon(Icons.add, color: Colors.white, size: 30),
@@ -622,7 +688,8 @@ class _HomePageState extends State<HomePage> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Toplam doğru: 0",
+                          "Toplam doğru: " +
+                              _userData.allTrueAnswers.toString(),
                           style: _textStyle.apply(
                             fontSizeDelta: 5,
                             shadows: [
@@ -660,7 +727,8 @@ class _HomePageState extends State<HomePage> {
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Toplam yanlış: 0",
+                          "Toplam yanlış: " +
+                              _userData.allWrongAnswers.toString(),
                           style: _textStyle.apply(
                             fontSizeDelta: 5,
                             shadows: [

@@ -38,6 +38,7 @@ dependencies:
   flare_flutter: ^3.0.0
   rive: ^0.7.0
   adaptive_action_sheet: ^2.0.0
+  provider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

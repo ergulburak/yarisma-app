@@ -1,10 +1,12 @@
 import 'dart:async';
 
 import 'package:bot_toast/bot_toast.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import 'package:yarisma_app/karsilama.dart';
 import 'Services/sayfaYonlendirici.dart';
 import 'Services/globals.dart' as globals;
@@ -16,19 +18,20 @@ void main() async {
 
 class BeklemeSayfasi extends StatelessWidget {
   const BeklemeSayfasi({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-      onGenerateRoute: RouteGenerator.generateRoute,
-      debugShowCheckedModeBanner: false,
-      builder: BotToastInit(),
-      theme: ThemeData(bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent)),
-      navigatorObservers: [BotToastNavigatorObserver()],
-      home: new Scaffold(
-        backgroundColor: Colors.transparent,
-        body: MyHomePage(),
-      ),
-    );
+        onGenerateRoute: RouteGenerator.generateRoute,
+        debugShowCheckedModeBanner: false,
+        builder: BotToastInit(),
+        theme: ThemeData(bottomSheetTheme: BottomSheetThemeData(backgroundColor: Colors.transparent)),
+        navigatorObservers: [BotToastNavigatorObserver()],
+        home: new Scaffold(
+    backgroundColor: Colors.transparent,
+    body: MyHomePage(),
+        ),
+      );
   }
 }
 

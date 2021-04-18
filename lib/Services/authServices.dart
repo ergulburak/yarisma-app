@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Services/globals.dart' as globals;
 
 class AuthService {
   final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
@@ -12,12 +15,13 @@ class AuthService {
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user == null) {
-        return "---";
-      } else
+        return "User null";
+      } else {
         return user.displayName;
+      }
     } catch (e) {
-      print("@@@@@@@@@@@@@@@@@@@@@@\n " + e.toString());
-      return "---";
+      print("Failed to gerUser()\n " + e.toString());
+      return "Failed to gerUser()";
     }
   }
 
@@ -89,5 +93,18 @@ class AuthService {
   Future<void> updateProfile(
       {required String displayName, String? photoURL}) async {
     await _user.updateProfile(displayName: displayName, photoURL: photoURL);
+    CollectionReference users=FirebaseFirestore.instance.collection("users");
+    globals.userData = new UserData(
+        uid: _user.uid,
+        nickname: displayName,
+        allTrueAnswers: 0,
+        allWrongAnswers: 0,
+        tickets: 0,
+        joker: 1,
+        rank: "user",
+        totalScore: 0,
+        weekScore: 0,
+        ticketAdCounter: 0);
+    users.add(globals.userData!.toJson());
   }
 }
