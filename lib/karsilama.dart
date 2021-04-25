@@ -20,20 +20,28 @@ class _KarsilamaState extends State<Karsilama> {
   @override
   void initState() {
     super.initState();
-    CollectionReference users = FirebaseFirestore.instance.collection('users');
+
     FirebaseAuth.instance.authStateChanges().listen((firebaseUser) {
       if (firebaseUser == null) {
         print("Oturum kapalı");
         Future.delayed(const Duration(seconds: 2),
             () => Navigator.pushNamed(context, "/login"));
       } else {
-        print(firebaseUser.displayName);
-        users.where("uid", isEqualTo: firebaseUser.uid).get().then((value) {
-          globals.userData = new UserData.fromJson(value.docs.first.data()!);
-          globals.userCollectionID = value.docs.first.reference.id;
-          Future.delayed(const Duration(seconds: 2),
-              () => Navigator.pushNamed(context, "/home", arguments: _auth));
-        });
+        print(firebaseUser.uid);
+        DocumentReference user = FirebaseFirestore.instance
+            .collection('users')
+            .doc(firebaseUser.uid);
+        user.get().then((value) => {
+              if (value.exists)
+                {
+                  globals.userData = new UserData.fromJson(value.data()!),
+                  globals.userCollectionID = firebaseUser.uid,
+                  Future.delayed(
+                      const Duration(seconds: 2),
+                      () => Navigator.pushNamed(context, "/home",
+                          arguments: _auth))
+                }
+            });
       }
     });
   }

@@ -93,7 +93,7 @@ class AuthService {
   Future<void> updateProfile(
       {required String displayName, String? photoURL}) async {
     await _user.updateProfile(displayName: displayName, photoURL: photoURL);
-    CollectionReference users=FirebaseFirestore.instance.collection("users");
+    CollectionReference users = FirebaseFirestore.instance.collection("users");
     globals.userData = new UserData(
         uid: _user.uid,
         nickname: displayName,
@@ -105,6 +105,7 @@ class AuthService {
         totalScore: 0,
         weekScore: 0,
         ticketAdCounter: 0);
-    users.add(globals.userData!.toJson());
+    users.doc(_user.uid).set(globals.userData!.toJson());
+    globals.userCollectionID = _user.uid;
   }
 }

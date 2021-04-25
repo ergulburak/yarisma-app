@@ -22,7 +22,7 @@ class Quiz {
   }
 
   toJson() {
-    return {"questions": questions, "year": year, "week": week};
+    return {"questions": json.encode(questions), "year": year, "week": week};
   }
 
   static List<Question> parseQuestion(String responseBody) {
