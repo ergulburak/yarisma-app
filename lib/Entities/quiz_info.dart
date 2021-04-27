@@ -3,7 +3,7 @@ import 'package:yarisma_app/Services/date_utils.dart';
 
 class QuizInfo {
   String quizState;
-  int quizWeek = DateUtils.weekOfYear(DateTime.now());
+  int quizWeek = CustomDateUtils.weekOfYear(DateTime.now());
 
   QuizInfo({required this.quizState});
 
