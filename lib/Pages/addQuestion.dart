@@ -9,11 +9,19 @@ import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 import 'package:yarisma_app/home_page.dart';
 
-final formKey = GlobalKey<FormState>();
 
-class AddQuestion extends StatelessWidget {
+
+class AddQuestion extends StatefulWidget {
   AddQuestion({required this.setHome});
 
+  final ValueChanged<Screens> setHome;
+
+  @override
+  _AddQuestionState createState() => _AddQuestionState();
+}
+
+class _AddQuestionState extends State<AddQuestion> {
+  final formKey = GlobalKey<FormState>();
   final _question = TextEditingController();
   final _optionA = TextEditingController();
   final _optionB = TextEditingController();
@@ -21,8 +29,8 @@ class AddQuestion extends StatelessWidget {
   final _optionD = TextEditingController();
   final _correctOption = TextEditingController();
   final _point = TextEditingController();
-  final ValueChanged<Screens> setHome;
   final TextStyle _textStyle = AppFont().getAppFont();
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -298,7 +306,7 @@ class AddQuestion extends StatelessWidget {
                             optionB: _optionB.text,
                             optionC: _optionC.text,
                             optionD: _optionD.text,
-                            correctOption: int.parse(_correctOption.text),
+                            correctOption: _correctOption.text=="A"?1:_correctOption.text=="B"?2:_correctOption.text=="C"?3:4,
                             point: int.parse(_point.text));
                         CollectionReference pendingQuestions = FirebaseFirestore
                             .instance
@@ -333,7 +341,7 @@ class AddQuestion extends StatelessWidget {
                         _optionD.clear();
                         _correctOption.clear();
                         _point.clear();
-                        setHome(Screens.MYQUESTIONS);
+                        widget.setHome(Screens.MYQUESTIONS);
                       }
                     },
                     child: Container(

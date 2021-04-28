@@ -29,6 +29,8 @@ class PanelQuestionForm extends StatelessWidget {
   final double _width = globals.telefonWidth! - 70;
   @override
   Widget build(BuildContext context) {
+    _panelWeek.text = CustomDateUtils.currentWeek().toString();
+    _panelYear.text = DateTime.now().year.toString();
     return Padding(
       padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
       child: Container(
@@ -80,35 +82,53 @@ class PanelQuestionForm extends StatelessWidget {
                                     late Quiz quiz;
                                     FirebaseFirestore.instance
                                         .collection("quizzes")
-                                        .doc(CustomDateUtils.currentWeek()
-                                                .toString() +
+                                        .doc(_panelWeek.text +
                                             "+" +
-                                            DateTime.now().year.toString())
+                                            _panelYear.text)
                                         .get()
                                         .then((value) {
-                                      quiz = new Quiz.fromFirestore(value);
-                                      quiz.questions.add(Question(
-                                          question: question,
-                                          optionA: optionA,
-                                          optionB: optionB,
-                                          optionC: optionC,
-                                          optionD: optionD,
-                                          correctOption: correctOption,
-                                          point: point));
-                                    }).then((value) => FirebaseFirestore
+                                          if (value.exists) {
+                                            quiz =
+                                                new Quiz.fromFirestore(value);
+                                            quiz.questions.add(Question(
+                                                question: question,
+                                                optionA: optionA,
+                                                optionB: optionB,
+                                                optionC: optionC,
+                                                optionD: optionD,
+                                                correctOption: correctOption,
+                                                point: point));
+                                          } else {
+                                            List<Question> temp = <Question>[];
+                                            temp.add(Question(
+                                                question: question,
+                                                optionA: optionA,
+                                                optionB: optionB,
+                                                optionC: optionC,
+                                                optionD: optionD,
+                                                correctOption: correctOption,
+                                                point: point));
+                                            quiz = new Quiz(
+                                                questions: temp,
+                                                week:
+                                                    int.parse(_panelWeek.text),
+                                                year:
+                                                    int.parse(_panelYear.text));
+                                          }
+                                        })
+                                        .then((value) => FirebaseFirestore
                                             .instance
                                             .collection("quizzes")
-                                            .doc(CustomDateUtils.currentWeek()
-                                                    .toString() +
+                                            .doc(_panelWeek.text +
                                                 "+" +
-                                                DateTime.now().year.toString())
-                                            .set(quiz.toJson()));
-                                    FirebaseFirestore.instance
-                                        .collection("quizzes")
-                                        .doc(CustomDateUtils.currentWeek()
-                                                .toString() +
-                                            "+" +
-                                            DateTime.now().year.toString());
+                                                _panelYear.text)
+                                            .set(quiz.toJson()))
+                                        .then((value) => FirebaseFirestore
+                                            .instance
+                                            .collection("pendingQuestions")
+                                            .doc(docID)
+                                            .delete());
+                                    Navigator.pop(c, false);
                                   }
                                 },
                               ),

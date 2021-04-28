@@ -18,7 +18,13 @@ class Quiz {
   }
 
   factory Quiz.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Quiz.fromJson(documentSnapshot.data()!);
+    Map<String, dynamic> data = documentSnapshot.data()!;
+    // ignore: unnecessary_null_comparison
+    if (data == null) {
+      return Quiz.fromJson(data);
+    } else {
+      return Quiz.fromJson(data);
+    }
   }
 
   toJson() {

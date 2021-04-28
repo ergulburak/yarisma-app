@@ -60,12 +60,10 @@ class UserData {
   }
 
   factory UserData.fromFirestore(DocumentSnapshot documentSnapshot) {
-    Map<String,dynamic> data=documentSnapshot.data()!;
-    if(data==null){
-      
+    Map<String, dynamic> data = documentSnapshot.data()!;
+    if (data == null) {
       return UserData.fromJson(data);
-    }
-    else{
+    } else {
       return UserData.fromJson(data);
     }
   }
