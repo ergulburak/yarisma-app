@@ -5,10 +5,14 @@ import 'package:yarisma_app/Entities/quiz.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Widgets/userQuestionForm.dart';
 
+enum States { COMPETITION, NULL }
+
 class UserQuestions extends StatelessWidget {
   UserQuestions({required this.userQuestion});
   final DocumentReference userQuestion;
   final TextStyle _textStyle = AppFont().getAppFont();
+
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<DocumentSnapshot>(

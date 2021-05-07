@@ -113,7 +113,8 @@ class PanelQuestionForm extends StatelessWidget {
                                                 week:
                                                     int.parse(_panelWeek.text),
                                                 year:
-                                                    int.parse(_panelYear.text));
+                                                    int.parse(_panelYear.text),
+                                                state: "unCompleted");
                                           }
                                         })
                                         .then((value) => FirebaseFirestore

@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:yarisma_app/Entities/scoreHandler.dart';
 import 'package:yarisma_app/Entities/user_data.dart';
 import 'package:yarisma_app/Services/authServices.dart';
 import 'package:yarisma_app/home_page.dart';
@@ -20,7 +21,11 @@ class _KarsilamaState extends State<Karsilama> {
   @override
   void initState() {
     super.initState();
-
+    globals.scoreHandler = new ScoreHandler(
+      correctCount: 0,
+      wrongCount: 0,
+      point: 0,
+    );
     FirebaseAuth.instance.authStateChanges().listen((firebaseUser) {
       if (firebaseUser == null) {
         print("Oturum kapalı");
@@ -66,7 +71,7 @@ class _KarsilamaState extends State<Karsilama> {
               child: Align(
                 alignment: Alignment.bottomCenter,
                 child: Text(
-                  "Manga Ship",
+                  "Quiz Ship",
                   style: _googleFonts.apply(fontSizeDelta: 30),
                 ),
               ),

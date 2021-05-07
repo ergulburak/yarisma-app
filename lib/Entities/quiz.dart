@@ -7,14 +7,21 @@ class Quiz {
   List<Question> questions;
   int year;
   int week;
+  String state;
 
-  Quiz({required this.questions, required this.year, required this.week});
+  Quiz(
+      {required this.questions,
+      required this.year,
+      required this.week,
+      required this.state});
 
   factory Quiz.fromJson(Map<String, dynamic> json) {
     return Quiz(
-        questions: parseQuestion(json['questions']),
-        year: int.parse(json['year'].toString()),
-        week: int.parse(json['week'].toString()));
+      questions: parseQuestion(json['questions']),
+      year: int.parse(json['year'].toString()),
+      week: int.parse(json['week'].toString()),
+      state: json['state'],
+    );
   }
 
   factory Quiz.fromFirestore(DocumentSnapshot documentSnapshot) {

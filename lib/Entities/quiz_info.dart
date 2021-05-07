@@ -3,12 +3,23 @@ import 'package:yarisma_app/Services/date_utils.dart';
 
 class QuizInfo {
   String quizState;
-  int quizWeek = CustomDateUtils.weekOfYear(DateTime.now());
+  String quizID;
+  int correctCount;
+  int wrongCount;
 
-  QuizInfo({required this.quizState});
+  QuizInfo(
+      {required this.quizState,
+      required this.quizID,
+      required this.correctCount,
+      required this.wrongCount});
 
   factory QuizInfo.fromJson(Map<String, dynamic> json) {
-    return QuizInfo(quizState: json['quizState']);
+    return QuizInfo(
+      quizState: json['quizState'],
+      quizID: json['quizID'],
+      correctCount: int.parse(json['correctCount']),
+      wrongCount: int.parse(json['wrongCount']),
+    );
   }
 
   factory QuizInfo.fromFirestore(DocumentSnapshot documentSnapshot) {
@@ -18,7 +29,9 @@ class QuizInfo {
   toJson() {
     return {
       "quizState": quizState,
-      "quizWeek": quizWeek,
+      "quizID": quizID,
+      "correctCount": correctCount,
+      "wrongCount": wrongCount,
     };
   }
 }

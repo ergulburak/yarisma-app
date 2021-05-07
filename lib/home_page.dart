@@ -12,7 +12,9 @@ import 'package:yarisma_app/Entities/quiz.dart';
 import 'package:yarisma_app/Entities/user_data.dart';
 import 'package:yarisma_app/Pages/addQuestion.dart';
 import 'package:yarisma_app/Pages/profile.dart';
+import 'package:yarisma_app/Pages/quizHandler.dart';
 import 'package:yarisma_app/Pages/userQuestions.dart';
+import 'package:yarisma_app/Services/date_utils.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/hexToColor.dart';
 import 'package:yarisma_app/Pages/panel.dart';
@@ -40,6 +42,11 @@ class _HomePageState extends State<HomePage> {
 
   CollectionReference pendingQuestions =
       FirebaseFirestore.instance.collection("pendingQuestions");
+  DocumentReference questionState = FirebaseFirestore.instance
+      .collection("quizzes")
+      .doc(CustomDateUtils.currentWeek().toString() +
+          "+" +
+          DateTime.now().year.toString());
   DocumentReference userQuestion = FirebaseFirestore.instance
       .collection("users")
       .doc(globals.userCollectionID);
@@ -59,7 +66,9 @@ class _HomePageState extends State<HomePage> {
 
   sayfa(BuildContext context) {
     if (screens == Screens.HOME)
-      return home(context);
+      return QuizHandler(
+        questionState: questionState,
+      ); //home(context); düzenlenecek
     else if (screens == Screens.PROFIL)
       return Profile(userData: _userData);
     else if (screens == Screens.LEADERBOARD)
@@ -388,241 +397,4 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  Widget trueAnswer(BuildContext context) {
-    return Container(
-      width: globals.telefonWidth,
-      height: globals.telefonHeight! / 2,
-      child: FlareActor(
-        "assets/success-1.flr",
-        alignment: Alignment.center,
-        fit: BoxFit.contain,
-        animation: 'verified',
-        callback: (name) {
-          if (name == "verified") {
-            Navigator.pop(context, false);
-          }
-        },
-      ),
-    );
-  }
-
-  Widget falseAnswer(BuildContext context) {
-    return Container(
-      width: globals.telefonWidth,
-      height: globals.telefonHeight! / 2,
-      child: FlareActor(
-        "assets/success_error.flr",
-        alignment: Alignment.center,
-        fit: BoxFit.contain,
-        animation: 'go',
-        callback: (name) {
-          if (name == "go") {
-            Navigator.pop(context, false);
-          }
-        },
-      ),
-    );
-  }
-
-  bool imageQuestion = false;
-  Color dogruColor = Colors.green;
-  Color yanlisColor = Colors.red;
-  Color aColor = Colors.white;
-  Color bColor = Colors.white;
-  Color cColor = Colors.white;
-  Color dColor = Colors.white;
-  bool aSikki = false;
-  bool bSikki = false;
-  bool cSikki = false;
-  bool dSikki = false;
-  Widget home(BuildContext context) {
-    /*return Align(
-      alignment: Alignment.center,
-      child: Text("Şuanda yarışma yok.", style: _textStyle),
-    );*/
-    return Container(
-      width: globals.telefonWidth,
-      height: globals.telefonHeight,
-      child: FittedBox(
-        alignment: Alignment.center,
-        fit: BoxFit.scaleDown,
-        child: Align(
-          alignment: Alignment.center,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              imageQuestion
-                  ? Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(5)),
-                      ),
-                      alignment: Alignment.center,
-                      width: globals.telefonWidth,
-                      height: globals.telefonWidth)
-                  : Container(),
-              Padding(
-                padding: EdgeInsets.all(20),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  alignment: Alignment.center,
-                  width: globals.telefonWidth,
-                  child: Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Text(
-                      "Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?Türkiyenin başkenti neresidir?",
-                      textAlign: TextAlign.center,
-                      style: _textStyle.apply(
-                        color: Colors.black,
-                        fontSizeDelta: 3,
-                        fontWeightDelta: 2,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      if (aSikki) {
-                        aColor = dogruColor;
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) =>
-                              trueAnswer(context),
-                        );
-                      } else {
-                        aColor = yanlisColor;
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) =>
-                              falseAnswer(context),
-                        );
-                      }
-
-                      print("Çalıştı.");
-                    });
-                  },
-                  child: AnimatedContainer(
-                    decoration: BoxDecoration(
-                      color: aColor,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    width: globals.telefonWidth,
-                    height: 50,
-                    duration: Duration(milliseconds: 100),
-                    child: Padding(
-                      padding: EdgeInsets.all(10),
-                      child: FittedBox(
-                        fit: BoxFit.scaleDown,
-                        child: Text(
-                          "A) Ankara",
-                          textAlign: TextAlign.center,
-                          style: _textStyle.apply(
-                            color: Colors.black,
-                            fontSizeDelta: 3,
-                            fontWeightDelta: 2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  width: globals.telefonWidth,
-                  height: 50,
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "A) Ankara",
-                        textAlign: TextAlign.center,
-                        style: _textStyle.apply(
-                          color: Colors.black,
-                          fontSizeDelta: 3,
-                          fontWeightDelta: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  width: globals.telefonWidth,
-                  height: 50,
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "A) Ankara",
-                        textAlign: TextAlign.center,
-                        style: _textStyle.apply(
-                          color: Colors.black,
-                          fontSizeDelta: 3,
-                          fontWeightDelta: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.fromLTRB(20, 0, 20, 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.all(Radius.circular(5)),
-                  ),
-                  alignment: Alignment.centerLeft,
-                  width: globals.telefonWidth,
-                  height: 50,
-                  child: Padding(
-                    padding: EdgeInsets.all(10),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Text(
-                        "A) Ankara",
-                        textAlign: TextAlign.center,
-                        style: _textStyle.apply(
-                          color: Colors.black,
-                          fontSizeDelta: 3,
-                          fontWeightDelta: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
 }

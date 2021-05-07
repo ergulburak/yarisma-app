@@ -9,8 +9,6 @@ import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 import 'package:yarisma_app/home_page.dart';
 
-
-
 class AddQuestion extends StatefulWidget {
   AddQuestion({required this.setHome});
 
@@ -30,6 +28,8 @@ class _AddQuestionState extends State<AddQuestion> {
   final _correctOption = TextEditingController();
   final _point = TextEditingController();
   final TextStyle _textStyle = AppFont().getAppFont();
+
+  String dropdownValue = 'A';
 
   @override
   Widget build(BuildContext context) {
@@ -229,35 +229,64 @@ class _AddQuestionState extends State<AddQuestion> {
                 ),
               ),
               SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: TextFormField(
-                    controller: _correctOption,
-                    validator: qValidator([
-                      IsRequired(msg: "Doğru şık"),
-                    ]),
-                    style: _textStyle.apply(color: Colors.white),
-                    decoration: InputDecoration(
-                      enabledBorder: const OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
-                      labelText: "Doğru şık",
-                      labelStyle: _textStyle.apply(color: Colors.white),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.white,
-                          width: 2.0,
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(
+                        color: Colors.white,
+                      )),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            "Doğru şık : ",
+                            style: _textStyle,
+                          ),
                         ),
                       ),
-                      border: new OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.white,
-                          width: 2.0,
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: DropdownButton<String>(
+                            value: dropdownValue,
+                            icon: const Icon(
+                              Icons.arrow_downward,
+                              color: Colors.white,
+                            ),
+                            iconSize: 20,
+                            elevation: 16,
+                            dropdownColor: Colors.black38,
+                            style: _textStyle,
+                            underline: Container(
+                              height: 2,
+                              color: Colors.white,
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownValue = newValue!;
+                              });
+                            },
+                            items: <String>['A', 'B', 'C', 'D']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: _textStyle,
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -306,7 +335,13 @@ class _AddQuestionState extends State<AddQuestion> {
                             optionB: _optionB.text,
                             optionC: _optionC.text,
                             optionD: _optionD.text,
-                            correctOption: _correctOption.text=="A"?1:_correctOption.text=="B"?2:_correctOption.text=="C"?3:4,
+                            correctOption: dropdownValue == "A"
+                                ? 1
+                                : dropdownValue == "B"
+                                    ? 2
+                                    : dropdownValue == "C"
+                                        ? 3
+                                        : 4,
                             point: int.parse(_point.text));
                         CollectionReference pendingQuestions = FirebaseFirestore
                             .instance
