@@ -14,7 +14,6 @@ class UserQuestionForm extends StatelessWidget {
   });
   final String question, optionA, optionB, optionC, optionD;
   final int correctOption, point;
-  final double _height = globals.telefonHeight! * 0.45;
   final double _width = globals.telefonWidth! - 70;
   final TextStyle _textStyle = AppFont().getAppFont();
   @override

@@ -7,7 +7,7 @@ import 'package:queen_validators/queen_validators.dart';
 import 'package:yarisma_app/Entities/question.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
-import 'package:yarisma_app/home_page.dart';
+import 'package:yarisma_app/Pages/homePage.dart';
 
 class AddQuestion extends StatefulWidget {
   AddQuestion({required this.setHome});

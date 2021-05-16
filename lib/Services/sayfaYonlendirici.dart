@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:yarisma_app/home_page.dart';
-import 'package:yarisma_app/login.dart';
+import 'package:yarisma_app/Pages/homePage.dart';
+import 'package:yarisma_app/Pages/login.dart';
 
 import '../main.dart';
 

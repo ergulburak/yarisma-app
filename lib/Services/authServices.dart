@@ -1,10 +1,7 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 
 class AuthService {
@@ -38,6 +35,7 @@ class AuthService {
 
   Future<bool> createUser(String nickname, String email, String pass) async {
     try {
+      // ignore: unused_local_variable
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: pass);
       _user = (_firebaseAuth.currentUser)!;
@@ -58,6 +56,7 @@ class AuthService {
 
   Future<bool> signIn(String email, String pass) async {
     try {
+      // ignore: unused_local_variable
       UserCredential userCredential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: pass);
 

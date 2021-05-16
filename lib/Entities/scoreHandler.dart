@@ -1,9 +1,11 @@
 class ScoreHandler {
+  String quizName;
   int correctCount;
   int wrongCount;
   int point;
 
   ScoreHandler({
+    required this.quizName,
     required this.correctCount,
     required this.wrongCount,
     required this.point,
@@ -11,14 +13,16 @@ class ScoreHandler {
 
   factory ScoreHandler.fromJson(Map<String, dynamic> json) {
     return ScoreHandler(
-      correctCount: int.parse(json['correctCount']),
-      wrongCount: int.parse(json['wrongCount']),
-      point: int.parse(json['point']),
+      quizName: json['quizName'],
+      correctCount: json['correctCount'],
+      wrongCount: json['wrongCount'],
+      point: json['point'],
     );
   }
 
   toJson() {
     return {
+      "quizName": quizName,
       "correctCount": correctCount,
       "wrongCount": wrongCount,
       "point": point,

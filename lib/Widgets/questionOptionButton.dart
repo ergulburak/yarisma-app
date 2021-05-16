@@ -21,6 +21,12 @@ class _QuestionOptionButtonState extends State<QuestionOptionButton> {
   Color correctColor = Colors.green;
   Color wrongColor = Colors.red;
   Color defaultColor = Colors.white;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(

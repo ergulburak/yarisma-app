@@ -1,13 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Widgets/panelPendingQuestions.dart';
-import 'package:yarisma_app/Widgets/panelQuestionForm.dart';
 
 class Panel extends StatelessWidget {
   Panel({required this.pendingQuestions});
   final CollectionReference pendingQuestions;
-  final TextStyle _textStyle = AppFont().getAppFont();
 
   @override
   Widget build(BuildContext context) {

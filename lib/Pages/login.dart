@@ -6,10 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:queen_validators/queen_validators.dart';
-import 'package:rive/rive.dart';
-import 'package:yarisma_app/home_page.dart';
-import 'Services/globals.dart' as globals;
-import 'Services/authServices.dart' as authServices;
+import '../Services/globals.dart' as globals;
+import '../Services/authServices.dart' as authServices;
 import 'dart:async';
 
 enum AuthMode { LOGIN, KAYIT, SIFREYENILEME, LOADING }
@@ -33,7 +31,6 @@ class _LoginEkraniState extends State<LoginEkrani> {
   final _emailKayit = TextEditingController();
   final _passwordKayit = TextEditingController();
   final _adSoyadKayit = TextEditingController();
-  final _telefonKayit = TextEditingController();
   final _passwordKontrolKayit = TextEditingController();
   final _recovery = TextEditingController();
 
@@ -62,10 +59,12 @@ class _LoginEkraniState extends State<LoginEkrani> {
               .signIn(_emailLogin.text.trim(), _passwordLogin.text.trim())
               .then((value) {
             if (value)
-              Navigator.pushNamed(context, "/home", arguments: FirebaseAuth.instance);
+              Navigator.pushNamed(context, "/home",
+                  arguments: FirebaseAuth.instance);
             else {
               _authMode = AuthMode.LOGIN;
-              BotToast.showText(text: "İşlem Başarısız.(Şifre yanlış olabilir.)");
+              BotToast.showText(
+                  text: "İşlem Başarısız.(Şifre yanlış olabilir.)");
               setState(() {});
             }
           });
@@ -88,7 +87,8 @@ class _LoginEkraniState extends State<LoginEkrani> {
               _authMode = AuthMode.LOGIN;
               BotToast.showText(text: "İşlem Başarısız.");
             } else {
-              Navigator.pushNamed(context, "/home", arguments: FirebaseAuth.instance);
+              Navigator.pushNamed(context, "/home",
+                  arguments: FirebaseAuth.instance);
             }
           });
           print("Signed up");
@@ -225,8 +225,8 @@ class _LoginEkraniState extends State<LoginEkrani> {
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                    child: FlatButton(
-                      onPressed: () {
+                    child: InkWell(
+                      onTap: () {
                         setState(() {
                           _authMode = AuthMode.SIFREYENILEME;
                           _height = globals.telefonHeight! * 0.30;

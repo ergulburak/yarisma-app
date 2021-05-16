@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 

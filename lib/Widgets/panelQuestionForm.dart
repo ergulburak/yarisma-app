@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:queen_validators/queen_validators.dart';
 import 'package:yarisma_app/Entities/question.dart';
 import 'package:yarisma_app/Entities/quiz.dart';
-import 'package:yarisma_app/Services/date_utils.dart';
+import 'package:yarisma_app/Services/dateUtils.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 import 'package:yarisma_app/Widgets/userQuestionForm.dart';

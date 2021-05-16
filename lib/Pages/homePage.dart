@@ -1,26 +1,20 @@
-import 'dart:convert';
-
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:queen_validators/queen_validators.dart';
-import 'package:yarisma_app/Entities/question.dart';
-import 'package:yarisma_app/Entities/quiz.dart';
-import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Pages/addQuestion.dart';
 import 'package:yarisma_app/Pages/profile.dart';
 import 'package:yarisma_app/Pages/quizHandler.dart';
 import 'package:yarisma_app/Pages/userQuestions.dart';
-import 'package:yarisma_app/Services/date_utils.dart';
+import 'package:yarisma_app/Services/dateUtils.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/hexToColor.dart';
 import 'package:yarisma_app/Pages/panel.dart';
-import 'Services/authServices.dart' as authServices;
-import 'Services/globals.dart' as globals;
-import 'package:yarisma_app/Services/date_utils.dart' as dataUtils;
+import '../Services/authServices.dart' as authServices;
+import '../Services/globals.dart' as globals;
 
 enum Screens { HOME, PROFIL, LEADERBOARD, PANEL, ADDQUESTION, MYQUESTIONS }
 
@@ -34,6 +28,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextStyle _textStyle = AppFont().getAppFont();
+  bool hamburgerCompetitionController = true;
   Screens screens = Screens.HOME;
   late UserData _userData;
 
@@ -42,6 +37,7 @@ class _HomePageState extends State<HomePage> {
 
   CollectionReference pendingQuestions =
       FirebaseFirestore.instance.collection("pendingQuestions");
+
   DocumentReference questionState = FirebaseFirestore.instance
       .collection("quizzes")
       .doc(CustomDateUtils.currentWeek().toString() +
@@ -64,11 +60,23 @@ class _HomePageState extends State<HomePage> {
     if (globals.userData != null) _userData = globals.userData!;
   }
 
+  void hamburgerController(String value) {
+    if (value.contains("COMPETITION")) {
+      hamburgerCompetitionController = false;
+    } else if (value.contains("HANDLER")) {
+      hamburgerCompetitionController = true;
+    } else {
+      hamburgerCompetitionController = true;
+    }
+  }
+
   sayfa(BuildContext context) {
     if (screens == Screens.HOME)
       return QuizHandler(
         questionState: questionState,
-      ); //home(context); düzenlenecek
+        stateInfo: hamburgerController,
+        finish: _update,
+      );
     else if (screens == Screens.PROFIL)
       return Profile(userData: _userData);
     else if (screens == Screens.LEADERBOARD)
@@ -204,7 +212,8 @@ class _HomePageState extends State<HomePage> {
                   )
                 else
                   Container(),
-                if (MediaQuery.of(context).viewInsets.bottom == 0)
+                if (MediaQuery.of(context).viewInsets.bottom == 0 &&
+                    hamburgerCompetitionController)
                   Padding(
                     padding: EdgeInsets.all(20),
                     child: Align(

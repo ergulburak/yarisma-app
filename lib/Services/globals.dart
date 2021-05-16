@@ -2,7 +2,7 @@ library gerekli.globals;
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:yarisma_app/Entities/scoreHandler.dart';
-import 'package:yarisma_app/Entities/user_data.dart';
+import 'package:yarisma_app/Entities/userData.dart';
 
 
 double? telefonHeight;
