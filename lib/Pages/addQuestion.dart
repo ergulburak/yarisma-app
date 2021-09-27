@@ -46,7 +46,7 @@ class _AddQuestionState extends State<AddQuestion> {
                   alignment: Alignment.centerLeft,
                   child: Text("Soru Ekle",
                       style: _textStyle.apply(
-                          color: Colors.white,
+                          color: Colors.black,
                           fontSizeDelta: 10,
                           fontWeightDelta: 2)),
                 ),
@@ -64,24 +64,24 @@ class _AddQuestionState extends State<AddQuestion> {
                     minLines: 1,
                     maxLines: 6,
                     validator: qValidator([
-                      IsRequired(msg: "Soru giriniz"),
+                      IsRequired("Soru giriniz"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "Soru giriniz",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -100,24 +100,24 @@ class _AddQuestionState extends State<AddQuestion> {
                     controller: _optionA,
                     keyboardType: TextInputType.emailAddress,
                     validator: qValidator([
-                      IsRequired(msg: "A şıkkı"),
+                      IsRequired("A şıkkı"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "A şıkkı",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -135,24 +135,24 @@ class _AddQuestionState extends State<AddQuestion> {
                   child: TextFormField(
                     controller: _optionB,
                     validator: qValidator([
-                      IsRequired(msg: "B şıkkı"),
+                      IsRequired("B şıkkı"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "B şıkkı",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -170,24 +170,24 @@ class _AddQuestionState extends State<AddQuestion> {
                   child: TextFormField(
                     controller: _optionC,
                     validator: qValidator([
-                      IsRequired(msg: "C şıkkı"),
+                      IsRequired("C şıkkı"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "C şıkkı",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -203,24 +203,24 @@ class _AddQuestionState extends State<AddQuestion> {
                   child: TextFormField(
                     controller: _optionD,
                     validator: qValidator([
-                      IsRequired(msg: "D şıkkı"),
+                      IsRequired("D şıkkı"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "D şıkkı",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -236,7 +236,7 @@ class _AddQuestionState extends State<AddQuestion> {
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(2),
                       border: Border.all(
-                        color: Colors.white,
+                        color: Colors.black,
                       )),
                   child: Row(
                     children: [
@@ -258,15 +258,15 @@ class _AddQuestionState extends State<AddQuestion> {
                             value: dropdownValue,
                             icon: const Icon(
                               Icons.arrow_downward,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             iconSize: 20,
                             elevation: 16,
-                            dropdownColor: Colors.black38,
+                            dropdownColor: Colors.white,
                             style: _textStyle,
                             underline: Container(
                               height: 2,
-                              color: Colors.white,
+                              color: Colors.black,
                             ),
                             onChanged: (String? newValue) {
                               setState(() {
@@ -298,24 +298,24 @@ class _AddQuestionState extends State<AddQuestion> {
                   child: TextFormField(
                     controller: _point,
                     validator: qValidator([
-                      IsRequired(msg: "Puan"),
+                      IsRequired("Puan"),
                     ]),
-                    style: _textStyle.apply(color: Colors.white),
+                    style: _textStyle.apply(color: Colors.black),
                     decoration: InputDecoration(
                       enabledBorder: const OutlineInputBorder(
                           borderSide: const BorderSide(
-                              color: Colors.white, width: 0.5)),
+                              color: Colors.black, width: 0.5)),
                       labelText: "Puan",
-                      labelStyle: _textStyle.apply(color: Colors.white),
+                      labelStyle: _textStyle.apply(color: Colors.black),
                       focusedBorder: OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
                       border: new OutlineInputBorder(
                         borderSide: const BorderSide(
-                          color: Colors.white,
+                          color: Colors.black,
                           width: 2.0,
                         ),
                       ),
@@ -325,7 +325,7 @@ class _AddQuestionState extends State<AddQuestion> {
               ),
               SizedBox(height: 20),
               Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
                 child: InkWell(
                     onTap: () {
                       if (formKey.currentState!.validate()) {
@@ -380,8 +380,18 @@ class _AddQuestionState extends State<AddQuestion> {
                       }
                     },
                     child: Container(
+                      alignment: Alignment.center,
+                      width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          stops: [0.5, 1.0],
+                          colors: [
+                            Colors.blueAccent.shade400,
+                            Colors.blueAccent.shade700,
+                          ],
+                        ),
                         borderRadius: BorderRadius.only(
                             topLeft: Radius.circular(5),
                             topRight: Radius.circular(5),
@@ -393,7 +403,7 @@ class _AddQuestionState extends State<AddQuestion> {
                         child: Text(
                           "Ekle",
                           style: _textStyle.apply(
-                              color: Colors.black, fontSizeDelta: 6),
+                              color: Colors.white, fontSizeDelta: 6),
                         ),
                       ),
                     )),

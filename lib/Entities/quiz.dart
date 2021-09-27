@@ -15,27 +15,30 @@ class Quiz {
       required this.week,
       required this.state});
 
-  factory Quiz.fromJson(Map<String, dynamic> json) {
-    return Quiz(
-      questions: parseQuestion(json['questions']),
-      year: int.parse(json['year'].toString()),
-      week: int.parse(json['week'].toString()),
-      state: json['state'],
-    );
-  }
-
-  factory Quiz.fromFirestore(DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data = documentSnapshot.data()!;
-    // ignore: unnecessary_null_comparison
-    if (data == null) {
-      return Quiz.fromJson(data);
+  factory Quiz.fromJson(Map<String, dynamic>? json) {
+    if (json != null) {
+      return Quiz(
+        questions: parseQuestion(json['questions']),
+        year: int.parse(json['year'].toString()),
+        week: int.parse(json['week'].toString()),
+        state: json['state'],
+      );
     } else {
-      return Quiz.fromJson(data);
+      return Quiz(questions: parseQuestion(""), year: 0, week: 0, state: "");
     }
   }
 
+  factory Quiz.fromFirestore(DocumentSnapshot documentSnapshot) {
+    return Quiz.fromJson(documentSnapshot.data() as Map<String, dynamic>);
+  }
+
   toJson() {
-    return {"questions": json.encode(questions), "year": year, "week": week};
+    return {
+      "questions": json.encode(questions),
+      "year": year,
+      "week": week,
+      "state": state
+    };
   }
 
   static List<Question> parseQuestion(String responseBody) {

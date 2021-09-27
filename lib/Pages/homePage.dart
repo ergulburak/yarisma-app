@@ -1,22 +1,23 @@
-import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Pages/addQuestion.dart';
+import 'package:yarisma_app/Pages/leaderboardPage.dart';
 import 'package:yarisma_app/Pages/profile.dart';
 import 'package:yarisma_app/Pages/quizHandler.dart';
 import 'package:yarisma_app/Pages/userQuestions.dart';
+import 'package:yarisma_app/Services/color.dart';
 import 'package:yarisma_app/Services/dateUtils.dart';
 import 'package:yarisma_app/Services/font.dart';
-import 'package:yarisma_app/Services/hexToColor.dart';
 import 'package:yarisma_app/Pages/panel.dart';
+import 'package:yarisma_app/Widgets/infoPillSheet.dart';
 import '../Services/authServices.dart' as authServices;
 import '../Services/globals.dart' as globals;
 
-enum Screens { HOME, PROFIL, LEADERBOARD, PANEL, ADDQUESTION, MYQUESTIONS }
+enum Screens { HOME, LEADERBOARD, PROFIL, ADDQUESTION, MYQUESTIONS, PANEL }
 
 class HomePage extends StatefulWidget {
   HomePage({required this.auth});
@@ -28,9 +29,10 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   TextStyle _textStyle = AppFont().getAppFont();
-  bool hamburgerCompetitionController = true;
+  bool navbarCompetitionController = true;
   Screens screens = Screens.HOME;
   late UserData _userData;
+  late String title;
 
   final formKey = GlobalKey<FormState>();
   final panelFormKey = GlobalKey<FormState>();
@@ -50,8 +52,27 @@ class _HomePageState extends State<HomePage> {
       .collection('users')
       .doc(FirebaseAuth.instance.currentUser!.uid);
 
+  Future<QuerySnapshot<Map<String, dynamic>>> leaderboardWeekPoints =
+      FirebaseFirestore.instance
+          .collection("users")
+          .where("lastWeek",
+              isEqualTo: (CustomDateUtils.currentWeek() - 1).toString() +
+                  "+" +
+                  DateTime.now().year.toString())
+          .orderBy("weekScore", descending: true)
+          .limit(10)
+          .get();
+
+  Future<QuerySnapshot<Map<String, dynamic>>> leaderboardTotalPoints =
+      FirebaseFirestore.instance
+          .collection("users")
+          .orderBy("totalScore", descending: true)
+          .limit(10)
+          .get();
+
   @override
   void initState() {
+    title = "Home";
     super.initState();
     setUserData();
   }
@@ -60,13 +81,13 @@ class _HomePageState extends State<HomePage> {
     if (globals.userData != null) _userData = globals.userData!;
   }
 
-  void hamburgerController(String value) {
+  void navbarController(String value) {
     if (value.contains("COMPETITION")) {
-      hamburgerCompetitionController = false;
+      navbarCompetitionController = false;
     } else if (value.contains("HANDLER")) {
-      hamburgerCompetitionController = true;
+      navbarCompetitionController = true;
     } else {
-      hamburgerCompetitionController = true;
+      navbarCompetitionController = true;
     }
   }
 
@@ -74,13 +95,15 @@ class _HomePageState extends State<HomePage> {
     if (screens == Screens.HOME)
       return QuizHandler(
         questionState: questionState,
-        stateInfo: hamburgerController,
-        finish: _update,
+        stateInfo: navbarController,
       );
     else if (screens == Screens.PROFIL)
       return Profile(userData: _userData);
     else if (screens == Screens.LEADERBOARD)
-      return leaderBoard(context);
+      return Leaderboard(
+        leaderboardTotalPoints: leaderboardTotalPoints,
+        leaderboardWeekPoints: leaderboardWeekPoints,
+      );
     else if (screens == Screens.MYQUESTIONS)
       return UserQuestions(userQuestion: userQuestion);
     else if (screens == Screens.ADDQUESTION)
@@ -91,6 +114,12 @@ class _HomePageState extends State<HomePage> {
 
   void _update(Screens screen) {
     setState(() => screens = screen);
+  }
+
+  void _handleIndexChanged(int i) {
+    setState(() {
+      screens = Screens.values[i];
+    });
   }
 
   @override
@@ -105,304 +134,332 @@ class _HomePageState extends State<HomePage> {
         } else if (snapshot.hasError) {
           print("null geldi.");
         }
-        return WillPopScope(
-          onWillPop: () async => showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: Text('Uyarı'),
-              content: Text('Uygulamayı kapatmak istediğine emin misin?'),
-              actions: [
-                TextButton(
-                  child: Text('Evet'),
-                  onPressed: () {
-                    SystemNavigator.pop();
-                  },
-                ),
-                TextButton(
-                  child: Text('Hayır'),
-                  onPressed: () => Navigator.pop(c, false),
-                ),
-              ],
-            ),
-          ).then((value) => value ?? false),
-          child: Scaffold(
-            backgroundColor: Colors.black,
-            body: Stack(
-              children: [
-                FlareActor(
-                  "assets/Cosmos.flr",
-                  alignment: Alignment.center,
-                  fit: BoxFit.cover,
-                  animation: 'idle',
-                ),
-                sayfa(context),
-                if (MediaQuery.of(context).viewInsets.bottom == 0 &&
-                    screens != Screens.ADDQUESTION &&
-                    screens != Screens.MYQUESTIONS &&
-                    screens != Screens.PANEL)
-                  SafeArea(
-                    child: Align(
-                      alignment: Alignment.topLeft,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
-                        child: Container(
-                          height: 80,
-                          width: globals.telefonWidth,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Text(
-                                  authServices.AuthService().getUser() ?? "---",
-                                  style: _textStyle.apply(fontSizeDelta: 25),
-                                ),
-                              ),
-                              FittedBox(
-                                fit: BoxFit.scaleDown,
-                                child: Padding(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Text("PUAN",
-                                            style: _textStyle.apply(
-                                                fontSizeDelta: -2)),
-                                        Text(
-                                          _userData.totalScore.toString(),
-                                          style: _textStyle.apply(
-                                            fontSizeDelta: 5,
-                                            color:
-                                                HexColor().getColor("#03fcc2"),
-                                            shadows: [
-                                              Shadow(
-                                                color: Colors.black,
-                                                offset: Offset(0, 0),
-                                                blurRadius: 5,
-                                              ),
-                                              Shadow(
-                                                color: Colors.black,
-                                                offset: Offset(0, 0),
-                                                blurRadius: 10,
-                                              ),
-                                              Shadow(
-                                                color: Colors.black,
-                                                offset: Offset(0, 0),
-                                                blurRadius: 3,
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                else
-                  Container(),
-                if (MediaQuery.of(context).viewInsets.bottom == 0 &&
-                    hamburgerCompetitionController)
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                    child: Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.black.withOpacity(.5),
-                        ),
-                        child: IconButton(
-                          color: Colors.black,
-                          icon: Icon(
-                            Icons.menu,
-                            color: Colors.white,
-                          ),
-                          alignment: Alignment.center,
-                          iconSize: 40,
-                          onPressed: () {
-                            showAdaptiveActionSheet(
-                              context: context,
-                              actions: <BottomSheetAction>[
-                                if (globals.userData!.rank == "admin")
-                                  BottomSheetAction(
-                                    title: Text(
-                                      'Panel',
-                                      style: _textStyle,
-                                    ),
-                                    onPressed: () {
-                                      screens = Screens.PANEL;
-                                      setState(() {});
-                                      Navigator.pop(context, false);
-                                    },
-                                    leading: const Icon(
-                                      Icons.settings_applications_sharp,
-                                      size: 25,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                if (globals.userData!.rank == "moderator" ||
-                                    globals.userData!.rank == "admin")
-                                  BottomSheetAction(
-                                    title: Text(
-                                      'Soru Ekle',
-                                      style: _textStyle,
-                                    ),
-                                    onPressed: () {
-                                      screens = Screens.ADDQUESTION;
-                                      setState(() {});
-                                      Navigator.pop(context, false);
-                                    },
-                                    leading: const Icon(
-                                      Icons.add_box,
-                                      size: 25,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                if (globals.userData!.rank == "moderator" ||
-                                    globals.userData!.rank == "admin")
-                                  BottomSheetAction(
-                                    title: Text(
-                                      'Sorularım',
-                                      style: _textStyle,
-                                    ),
-                                    onPressed: () {
-                                      screens = Screens.MYQUESTIONS;
-                                      setState(() {});
-                                      Navigator.pop(context, false);
-                                    },
-                                    leading: const Icon(
-                                      Icons.search_outlined,
-                                      size: 25,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                BottomSheetAction(
-                                  title: Text(
-                                    'Anasayfa',
-                                    style: _textStyle,
-                                  ),
-                                  onPressed: () {
-                                    screens = Screens.HOME;
-                                    setState(() {});
-                                    Navigator.pop(context, false);
-                                  },
-                                  leading: const Icon(
-                                    Icons.home,
-                                    size: 25,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                BottomSheetAction(
-                                  title: Text(
-                                    'Profil',
-                                    style: _textStyle,
-                                  ),
-                                  onPressed: () {
-                                    screens = Screens.PROFIL;
-                                    setState(() {});
-                                    Navigator.pop(context, false);
-                                  },
-                                  leading: const Icon(
-                                    Icons.portrait,
-                                    size: 25,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                BottomSheetAction(
-                                  title: Text(
-                                    'Lider Tablosu',
-                                    style: _textStyle,
-                                  ),
-                                  onPressed: () {
-                                    screens = Screens.LEADERBOARD;
-                                    setState(() {});
-                                    Navigator.pop(context, false);
-                                  },
-                                  leading: const Icon(
-                                    Icons.leaderboard,
-                                    size: 25,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                BottomSheetAction(
-                                  title: Text(
-                                    'Çıkış Yap',
-                                    style: _textStyle,
-                                  ),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (c) => AlertDialog(
-                                        title: Text('Uyarı'),
-                                        content: Text(
-                                            'Çıkış yapmak istediğine emin misin?'),
-                                        actions: [
-                                          TextButton(
-                                            child: Text('Evet'),
-                                            onPressed: () {
-                                              authServices.AuthService()
-                                                  .signOut();
-                                              Navigator.pop(context, false);
-                                              Navigator.pushNamed(
-                                                  context, '/login');
-                                            },
-                                          ),
-                                          TextButton(
-                                            child: Text('Hayır'),
-                                            onPressed: () =>
-                                                Navigator.pop(c, false),
-                                          ),
-                                        ],
-                                      ),
-                                    ).then((value) => value ?? false);
-                                  },
-                                  leading: const Icon(
-                                    Icons.exit_to_app,
-                                    size: 25,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        );
+        return navbarCompetitionController
+            ? navbarOpen(context)
+            : navbarClose(context);
       },
     );
   }
 
-  Widget leaderBoard(BuildContext context) {
-    return Container(
-      width: globals.telefonWidth,
-      height: globals.telefonHeight! / 2,
-      child: FlareActor(
-        "assets/success-1.flr",
-        alignment: Alignment.center,
-        fit: BoxFit.contain,
-        animation: 'verified',
-        callback: (name) {
-          if (name == "verified") {
-            Navigator.pop(context, false);
-          }
-        },
+  Widget navbarOpen(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: Text('Uyarı'),
+          content: Text('Çıkış yapmak istediğine emin misin?'),
+          actions: [
+            TextButton(
+              child: Text('Evet'),
+              onPressed: () {
+                authServices.AuthService().signOut();
+                Navigator.pop(context, false);
+                Navigator.pushNamed(context, '/login');
+              },
+            ),
+            TextButton(
+              child: Text('Hayır'),
+              onPressed: () => Navigator.pop(c, false),
+            ),
+          ],
+        ),
+      ).then((value) => value ?? false),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.all(0),
+          child: DotNavigationBar(
+            currentIndex: Screens.values.indexOf(screens),
+            marginR: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+            paddingR: const EdgeInsets.only(bottom: 0, top: 0),
+            dotIndicatorColor: Colors.blue,
+            onTap: _handleIndexChanged,
+            items: [
+              /// Home
+              DotNavigationBarItem(
+                icon: Icon(Icons.home),
+                selectedColor: Colors.greenAccent[600],
+              ),
+
+              /// Leaderboard
+              DotNavigationBarItem(
+                icon: Icon(Icons.leaderboard),
+                selectedColor: Colors.pink[600],
+              ),
+
+              /// Profile
+              DotNavigationBarItem(
+                icon: Icon(Icons.person),
+                selectedColor: Colors.orange[600],
+              ),
+
+              /// Add Question
+              if (globals.userData!.rank == "admin" ||
+                  globals.userData!.rank == "moderator")
+                DotNavigationBarItem(
+                  icon: Icon(Icons.add),
+                  selectedColor: Colors.blue[600],
+                ),
+
+              /// My Question
+              if (globals.userData!.rank == "admin" ||
+                  globals.userData!.rank == "moderator")
+                DotNavigationBarItem(
+                  icon: Icon(Icons.search),
+                  selectedColor: Colors.blue[600],
+                ),
+
+              /// Panel
+              if (globals.userData!.rank == "admin")
+                DotNavigationBarItem(
+                  icon: Icon(Icons.settings),
+                  selectedColor: Colors.blue[600],
+                ),
+            ],
+          ),
+        ),
+        body: Stack(
+          children: [
+            sayfa(context),
+            if (MediaQuery.of(context).viewInsets.bottom == 0 &&
+                screens != Screens.ADDQUESTION &&
+                screens != Screens.MYQUESTIONS &&
+                screens != Screens.PANEL)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Container(
+                      height: 110,
+                      width: globals.telefonWidth,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          stops: [0.5, 1.0],
+                          colors: [
+                            Colors.blueAccent.shade400,
+                            Colors.blueAccent.shade700,
+                          ],
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    authServices.AuthService().getUser() ??
+                                        "---",
+                                    style: _textStyle.apply(
+                                        fontSizeDelta: 25, color: Colors.white),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(0, 2, 2, 10),
+                                      child: InfoPillSheet(
+                                        userData: _userData.tickets.toString(),
+                                        textStyle: _textStyle,
+                                        icon: Icons.local_offer_outlined,
+                                        color: AppColors().pillColor,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(0, 2, 2, 10),
+                                      child: InfoPillSheet(
+                                        userData: _userData.joker.toString(),
+                                        textStyle: _textStyle,
+                                        icon: Icons.local_attraction_outlined,
+                                        color: AppColors().pillColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 20),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "PUAN",
+                                      style:
+                                          _textStyle.apply(color: Colors.white),
+                                    ),
+                                    Text(
+                                      _userData.totalScore.toString(),
+                                      style: _textStyle.apply(
+                                        fontSizeDelta: 5,
+                                        color: AppColors().allPointColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              Container(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget navbarClose(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async => showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: Text('Uyarı'),
+          content: Text('Çıkış yapmak istediğine emin misin?'),
+          actions: [
+            TextButton(
+              child: Text('Evet'),
+              onPressed: () {
+                authServices.AuthService().signOut();
+                Navigator.pop(context, false);
+                Navigator.pushNamed(context, '/login');
+              },
+            ),
+            TextButton(
+              child: Text('Hayır'),
+              onPressed: () => Navigator.pop(c, false),
+            ),
+          ],
+        ),
+      ).then((value) => value ?? false),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            sayfa(context),
+            if (MediaQuery.of(context).viewInsets.bottom == 0 &&
+                screens != Screens.ADDQUESTION &&
+                screens != Screens.MYQUESTIONS &&
+                screens != Screens.LEADERBOARD &&
+                screens != Screens.PANEL)
+              SafeArea(
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(0, 0, 0, 0),
+                    child: Container(
+                      height: 110,
+                      width: globals.telefonWidth,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          stops: [0.5, 1.0],
+                          colors: [
+                            Colors.blueAccent.shade400,
+                            Colors.blueAccent.shade700,
+                          ],
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(20, 10, 0, 0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  fit: BoxFit.scaleDown,
+                                  child: Text(
+                                    authServices.AuthService().getUser() ??
+                                        "---",
+                                    style: _textStyle.apply(
+                                        fontSizeDelta: 25, color: Colors.white),
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(0, 2, 2, 10),
+                                      child: InfoPillSheet(
+                                        userData: _userData.tickets.toString(),
+                                        textStyle: _textStyle,
+                                        icon: Icons.local_offer_outlined,
+                                        color: AppColors().pillColor,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: EdgeInsets.fromLTRB(0, 2, 2, 10),
+                                      child: InfoPillSheet(
+                                        userData: _userData.joker.toString(),
+                                        textStyle: _textStyle,
+                                        icon: Icons.local_attraction_outlined,
+                                        color: AppColors().pillColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Padding(
+                              padding: EdgeInsets.only(right: 20),
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "PUAN",
+                                      style:
+                                          _textStyle.apply(color: Colors.white),
+                                    ),
+                                    Text(
+                                      _userData.totalScore.toString(),
+                                      style: _textStyle.apply(
+                                        fontSizeDelta: 5,
+                                        color: AppColors().allPointColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              )
+            else
+              Container(),
+          ],
+        ),
       ),
     );
   }

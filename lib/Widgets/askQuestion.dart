@@ -5,6 +5,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
+import 'package:yarisma_app/Services/color.dart';
 import 'package:yarisma_app/Services/font.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 import 'package:yarisma_app/Widgets/questionOptionButton.dart';
@@ -41,6 +42,7 @@ class _AskQuestionState extends State<AskQuestion> {
   List<int> jokerList = <int>[];
 
   double standbyTime = 0.0;
+  double questionWaitingTime = 500;
   static const oneSec = const Duration(seconds: 1);
 
   bool isJokerUsed = false;
@@ -53,7 +55,7 @@ class _AskQuestionState extends State<AskQuestion> {
     jokerList.remove(widget.correctOption - 1);
     jokerList.shuffle();
     _timer = new Timer.periodic(oneSec, (timer) {
-      if (standbyTime == 30) {
+      if (standbyTime == questionWaitingTime) {
         setState(() {
           timer.cancel();
           _scoreHandler(false);
@@ -70,7 +72,7 @@ class _AskQuestionState extends State<AskQuestion> {
   double normalizedNum(val, max, min) {
     val = val - min;
     max = max - min;
-    return math.max(0, math.min(1, val / max));
+    return 1 - (math.max(0, math.min(1, val / max)));
   }
 
   @override
@@ -118,50 +120,86 @@ class _AskQuestionState extends State<AskQuestion> {
             children: [
               Expanded(
                 flex: 1,
-                child: Padding(
-                  padding: EdgeInsets.all(20),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      stops: [0.5, 1.0],
+                      colors: [
+                        Colors.blueAccent.shade400,
+                        Colors.blueAccent.shade700,
+                      ],
                     ),
-                    alignment: Alignment.center,
-                    width: globals.telefonWidth,
-                    child: Stack(
-                      children: [
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30),
+                    ),
+                  ),
+                  alignment: Alignment.center,
+                  width: globals.telefonWidth,
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            widget.question,
+                            textAlign: TextAlign.center,
+                            style: _textStyle.apply(
+                              color: AppColors().questionColor,
+                              fontSizeDelta: 3,
+                              fontWeightDelta: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                      if (!isJokerUsed)
                         Align(
-                          alignment: Alignment.center,
+                          alignment: Alignment.topRight,
                           child: Padding(
-                            padding: EdgeInsets.all(20),
-                            child: Text(
-                              widget.question,
-                              textAlign: TextAlign.center,
-                              style: _textStyle.apply(
-                                color: Colors.black,
-                                fontSizeDelta: 3,
-                                fontWeightDelta: 2,
+                            padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
+                            child: InkWell(
+                              onTap: () {
+                                if (globals.userData!.joker > 0) {
+                                  setState(() {
+                                    _useJoker();
+                                  });
+                                } else {
+                                  BotToast.showText(
+                                      text: "Yeterli joker hakkınız yok.");
+                                }
+                              },
+                              child: Container(
+                                width: 80,
+                                height: 80,
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                  image: DecorationImage(
+                                      image: ExactAssetImage(
+                                          "assets/joker@1x.png"),
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.bottomCenter),
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(5),
+                                    topRight: Radius.circular(5),
+                                    bottomLeft: Radius.circular(5),
+                                    bottomRight: Radius.circular(5),
+                                  ),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                        LinearPercentIndicator(
-                          lineHeight: 14.0,
-                          percent: normalizedNum(standbyTime, 30.0, 0.0),
-                          linearStrokeCap: LinearStrokeCap.butt,
-                          backgroundColor: Colors.transparent,
-                          padding: EdgeInsets.all(0),
-                          alignment: MainAxisAlignment.center,
-                          linearGradient: LinearGradient(
-                              colors: [Colors.green, Colors.green, Colors.red]),
-                        ),
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ),
               Expanded(
                 flex: 1,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (!jokerOptionBool[0])
                       QuestionOptionButton(
@@ -187,40 +225,19 @@ class _AskQuestionState extends State<AskQuestion> {
                         isCorrect: widget.correctOption == 4 ? true : false,
                         answer: _scoreHandler,
                       ),
-                    if (!isJokerUsed)
-                      Padding(
-                        padding: EdgeInsets.fromLTRB(10, 30, 10, 10),
-                        child: InkWell(
-                          onTap: () {
-                            if (globals.userData!.joker > 0) {
-                              setState(() {
-                                _useJoker();
-                              });
-                            } else {
-                              BotToast.showText(text: "Yeterli joker hakkınız yok.");
-                            }
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent,
-                              borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(5),
-                                  topRight: Radius.circular(5),
-                                  bottomLeft: Radius.circular(5),
-                                  bottomRight: Radius.circular(5)),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(10),
-                              child: Text(
-                                "50/50",
-                                style: _textStyle.apply(
-                                    color: Colors.black, fontSizeDelta: 3),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                   ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: LinearPercentIndicator(
+                  lineHeight: 14.0,
+                  percent: normalizedNum(standbyTime, questionWaitingTime, 0.0),
+                  linearStrokeCap: LinearStrokeCap.butt,
+                  backgroundColor: Colors.transparent,
+                  padding: EdgeInsets.all(0),
+                  alignment: MainAxisAlignment.center,
+                  progressColor: Colors.blueAccent,
                 ),
               ),
             ],

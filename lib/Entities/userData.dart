@@ -15,6 +15,7 @@ class UserData {
   int totalScore;
   int weekScore;
   int ticketAdCounter;
+  String? lastWeek;
   List<Question>? questions;
   List<ScoreHandler>? scoreHandler;
 
@@ -29,6 +30,7 @@ class UserData {
       required this.totalScore,
       required this.weekScore,
       required this.ticketAdCounter,
+      this.lastWeek,
       this.questions,
       this.scoreHandler});
 
@@ -46,6 +48,7 @@ class UserData {
         totalScore: int.parse(json['totalScore'].toString()),
         weekScore: int.parse(json['weekScore'].toString()),
         ticketAdCounter: int.parse(json['ticketAdCounter'].toString()),
+        lastWeek: json["lastWeek"],
         questions: parseQuestion(json['questions']),
         scoreHandler: parseScoreHandler(json['scoreHandler']),
       );
@@ -61,6 +64,7 @@ class UserData {
         rank: json['rank'],
         totalScore: int.parse(json['totalScore'].toString()),
         weekScore: int.parse(json['weekScore'].toString()),
+        lastWeek: json["lastWeek"],
         ticketAdCounter: int.parse(json['ticketAdCounter'].toString()),
         questions: parseQuestion(json['questions']),
       );
@@ -76,6 +80,7 @@ class UserData {
         rank: json['rank'],
         totalScore: int.parse(json['totalScore'].toString()),
         weekScore: int.parse(json['weekScore'].toString()),
+        lastWeek: json["lastWeek"],
         ticketAdCounter: int.parse(json['ticketAdCounter'].toString()),
         scoreHandler: parseScoreHandler(json['scoreHandler']),
       );
@@ -90,18 +95,13 @@ class UserData {
           rank: json['rank'],
           totalScore: int.parse(json['totalScore'].toString()),
           weekScore: int.parse(json['weekScore'].toString()),
+          lastWeek: json["lastWeek"],
           ticketAdCounter: int.parse(json['ticketAdCounter'].toString()));
     }
   }
 
   factory UserData.fromFirestore(DocumentSnapshot documentSnapshot) {
-    Map<String, dynamic> data = documentSnapshot.data()!;
-    // ignore: unnecessary_null_comparison
-    if (data == null) {
-      return UserData.fromJson(data);
-    } else {
-      return UserData.fromJson(data);
-    }
+    return UserData.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
   static List<Question> parseQuestion(String responseBody) {
@@ -130,6 +130,7 @@ class UserData {
       "ticketAdCounter": ticketAdCounter,
       "questions": json.encode(questions),
       "scoreHandler": json.encode(scoreHandler),
+      "lastWeek": lastWeek
     };
   }
 }

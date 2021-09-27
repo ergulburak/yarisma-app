@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:upgrader/upgrader.dart';
 import 'package:yarisma_app/Entities/scoreHandler.dart';
 import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Services/dateUtils.dart';
@@ -39,7 +40,8 @@ class _KarsilamaState extends State<Karsilama> {
         user.get().then((value) => {
               if (value.exists)
                 {
-                  globals.userData = new UserData.fromJson(value.data()!),
+                  globals.userData = new UserData.fromJson(
+                      value.data() as Map<String, dynamic>),
                   globals.userCollectionID = firebaseUser.uid,
                   Future.delayed(
                       const Duration(seconds: 2),
@@ -55,28 +57,33 @@ class _KarsilamaState extends State<Karsilama> {
   Widget build(BuildContext context) {
     TextStyle _googleFonts = GoogleFonts.robotoMono(
         color: Colors.white, fontSize: 17, fontWeight: FontWeight.normal);
+    Upgrader().clearSavedSettings();
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Center(
-        child: Stack(
-          children: [
-            new FlareActor(
-              "assets/Loading.flr",
-              alignment: Alignment.center,
-              fit: BoxFit.contain,
-              animation: 'Alarm',
-            ),
-            Padding(
-              padding: EdgeInsets.only(bottom: 20),
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Text(
-                  "Quiz Ship",
-                  style: _googleFonts.apply(fontSizeDelta: 30),
+      body: UpgradeAlert(
+        showIgnore: false,
+        showLater: false,
+        child: Center(
+          child: Stack(
+            children: [
+              new FlareActor(
+                "assets/Loading.flr",
+                alignment: Alignment.center,
+                fit: BoxFit.contain,
+                animation: 'Alarm',
+              ),
+              Padding(
+                padding: EdgeInsets.only(bottom: 20),
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Text(
+                    "Quiz Ship",
+                    style: _googleFonts.apply(fontSizeDelta: 30),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

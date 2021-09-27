@@ -20,7 +20,7 @@ class _QuestionOptionButtonState extends State<QuestionOptionButton> {
   TextStyle _textStyle = AppFont().getAppFont();
   Color correctColor = Colors.green;
   Color wrongColor = Colors.red;
-  Color defaultColor = Colors.white;
+  Color defaultColor = Colors.grey.shade300;
 
   @override
   void initState() {
@@ -37,7 +37,7 @@ class _QuestionOptionButtonState extends State<QuestionOptionButton> {
             color: defaultColor,
             borderRadius: BorderRadius.all(Radius.circular(5)),
           ),
-          alignment: Alignment.centerLeft,
+          alignment: Alignment.center,
           width: globals.telefonWidth,
           height: 50,
           duration: Duration(milliseconds: 100),

@@ -23,6 +23,10 @@ class UserQuestionForm extends StatelessWidget {
       child: Container(
         width: _width,
         decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.blueAccent,
+            width: 2,
+          ),
           color: Colors.white,
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(5),
@@ -33,7 +37,7 @@ class UserQuestionForm extends StatelessWidget {
         child: Column(
           children: [
             Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              padding: EdgeInsets.fromLTRB(10, 10, 10, 0),
               child: Text(
                 question,
                 style: _textStyle.apply(color: Colors.black),

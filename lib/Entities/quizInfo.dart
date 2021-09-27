@@ -22,7 +22,7 @@ class QuizInfo {
   }
 
   factory QuizInfo.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return QuizInfo.fromJson(documentSnapshot.data()!);
+    return QuizInfo.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
   toJson() {

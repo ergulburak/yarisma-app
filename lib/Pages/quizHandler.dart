@@ -1,30 +1,29 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:yarisma_app/Entities/scoreHandler.dart';
+import 'package:yarisma_app/Services/color.dart';
 import 'package:yarisma_app/Services/dateUtils.dart';
 import 'package:yarisma_app/Services/font.dart';
-import 'package:yarisma_app/Services/hexToColor.dart';
 import 'package:yarisma_app/Widgets/askQuestion.dart';
 import 'package:yarisma_app/Entities/quiz.dart';
 import 'package:yarisma_app/Services/globals.dart' as globals;
 import 'package:yarisma_app/Widgets/cooldownScreen.dart';
-import 'package:yarisma_app/Pages/homePage.dart';
 
 enum States { COMPETITION, HANDLER, NULL, COOLDOWN, END }
+
+const int maxFailedLoadAttempts = 3;
 
 class QuizHandler extends StatefulWidget {
   QuizHandler({
     required this.questionState,
     required this.stateInfo,
-    required this.finish,
   });
   final DocumentReference questionState;
   final ValueChanged<String> stateInfo;
-  final ValueChanged<Screens> finish;
   @override
   _QuizHandlerState createState() => _QuizHandlerState();
 }
@@ -56,16 +55,22 @@ class _QuizHandlerState extends State<QuizHandler> {
   @override
   void initState() {
     _states = States.HANDLER;
-    widget.questionState
-        .get()
-        .then((value) => _quiz = Quiz.fromFirestore(value));
+    quizLoad();
     super.initState();
+    _createInterstitialAd();
+  }
+
+  void quizLoad() {
+    widget.questionState.get().then((value) {
+      if (value.exists) _quiz = Quiz.fromFirestore(value);
+    });
   }
 
   @override
   void dispose() {
     _states = States.NULL;
     super.dispose();
+    _interstitialAd?.dispose();
   }
 
   @override
@@ -102,6 +107,8 @@ class _QuizHandlerState extends State<QuizHandler> {
                   'totalScore': globals.userData!.totalScore,
                   'allTrueAnswers': globals.userData!.allTrueAnswers,
                   'allWrongAnswers': globals.userData!.allWrongAnswers,
+                  'weekScore': globals.scoreHandler!.point,
+                  'lastWeek': globals.scoreHandler!.quizName
                 })
                 .then((value) => print("User Updated"))
                 .catchError((error) => print("Failed to update user: $error"));
@@ -130,83 +137,211 @@ class _QuizHandlerState extends State<QuizHandler> {
   }
 
   Widget end(BuildContext context) {
-    Timer(Duration(seconds: 5), () => widget.finish(Screens.LEADERBOARD));
-    return Align(
-      alignment: Alignment.center,
-      child: Container(
-        height: globals.telefonHeight! * .5,
-        width: globals.telefonWidth! - 50,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.all(Radius.circular(15)),
-        ),
-        alignment: Alignment.center,
-        child: Container(
-          width: globals.telefonWidth! * .7,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "Sonuç",
-                    style: _textStyle.apply(
-                      fontSizeDelta: 20,
-                      fontWeightDelta: 3,
-                      color: Colors.black,
-                    ),
-                  ),
+    _showInterstitialAd();
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.only(top: 100),
+        child: Column(
+          children: [
+            Container(
+              height: globals.telefonHeight! * .45,
+              width: globals.telefonWidth,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  stops: [0.5, 1.0],
+                  colors: [
+                    Colors.blueAccent.shade400,
+                    Colors.blueAccent.shade700,
+                  ],
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30),
+                  bottomRight: Radius.circular(30),
                 ),
               ),
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "Doğru Sayısı: " +
-                        globals.scoreHandler!.correctCount.toString(),
-                    style: _textStyle.apply(
-                      fontSizeDelta: 10,
-                      color: Colors.black,
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "TEBRİKLER",
+                      style: _textStyle.apply(
+                        fontSizeDelta: 20,
+                        fontWeightDelta: 3,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "Yanlış Sayısı: " +
-                        globals.scoreHandler!.wrongCount.toString(),
-                    style: _textStyle.apply(
-                      fontSizeDelta: 10,
-                      color: Colors.black,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Container(
+                      alignment: Alignment.center,
+                      width: 200,
+                      height: 200,
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                            image: ExactAssetImage("assets/confetti@1x.png"),
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.bottomCenter),
+                        color: Colors.transparent,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.all(10),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "Puan: " + globals.scoreHandler!.point.toString(),
-                    style: _textStyle.apply(
-                      fontSizeDelta: 30,
-                      color: Colors.black,
+            ),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+                    child: AnimatedContainer(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      alignment: Alignment.center,
+                      width: globals.telefonWidth,
+                      height: 50,
+                      duration: Duration(milliseconds: 100),
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Doğru Sayısı: " +
+                                globals.scoreHandler!.correctCount.toString(),
+                            textAlign: TextAlign.center,
+                            style: _textStyle.apply(
+                              color: Colors.black,
+                              fontSizeDelta: 3,
+                              fontWeightDelta: 2,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: AnimatedContainer(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      alignment: Alignment.center,
+                      width: globals.telefonWidth,
+                      height: 50,
+                      duration: Duration(milliseconds: 100),
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Yanlış Sayısı: " +
+                                globals.scoreHandler!.wrongCount.toString(),
+                            textAlign: TextAlign.center,
+                            style: _textStyle.apply(
+                              color: Colors.black,
+                              fontSizeDelta: 3,
+                              fontWeightDelta: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(20, 10, 20, 10),
+                    child: AnimatedContainer(
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade300,
+                        borderRadius: BorderRadius.all(Radius.circular(5)),
+                      ),
+                      alignment: Alignment.center,
+                      width: globals.telefonWidth,
+                      height: 50,
+                      duration: Duration(milliseconds: 100),
+                      child: Padding(
+                        padding: EdgeInsets.all(10),
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Puan: " + globals.scoreHandler!.point.toString(),
+                            textAlign: TextAlign.center,
+                            style: _textStyle.apply(
+                              color: Colors.black,
+                              fontSizeDelta: 3,
+                              fontWeightDelta: 2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
+  }
+
+  InterstitialAd? _interstitialAd;
+  int _numInterstitialLoadAttempts = 0;
+
+  void _createInterstitialAd() {
+    InterstitialAd.load(
+        adUnitId: "ca-app-pub-8337349993896228/3054411976",
+        request: AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            print('$ad loaded');
+            _interstitialAd = ad;
+            _numInterstitialLoadAttempts = 0;
+            _interstitialAd!.setImmersiveMode(true);
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            print('InterstitialAd failed to load: $error.');
+            _numInterstitialLoadAttempts += 1;
+            _interstitialAd = null;
+            if (_numInterstitialLoadAttempts <= maxFailedLoadAttempts) {
+              _createInterstitialAd();
+            }
+          },
+        ));
+  }
+
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
+      print('Warning: attempt to show interstitial before loaded.');
+      return;
+    }
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          print('ad onAdShowedFullScreenContent.'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        print('$ad onAdDismissedFullScreenContent.');
+        ad.dispose();
+        _createInterstitialAd();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        print('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+        _createInterstitialAd();
+      },
+    );
+    _interstitialAd!.show();
+    _interstitialAd = null;
   }
 
   Widget handler(BuildContext context) {
@@ -214,7 +349,27 @@ class _QuizHandlerState extends State<QuizHandler> {
       stream: widget.questionState.snapshots(),
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-        if (snapshot.hasData) {
+        if (snapshot.hasError) {
+          return Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Bağlantı hatası.",
+              style: _textStyle,
+            ),
+          );
+        }
+
+        if (snapshot.hasData && !snapshot.data!.exists) {
+          return Align(
+            alignment: Alignment.center,
+            child: Text(
+              "Aktif quiz bulunamadı.",
+              style: _textStyle,
+            ),
+          );
+        }
+
+        if (snapshot.connectionState == ConnectionState.active) {
           bool isEnter = false;
           if (globals.userData!.scoreHandler == null) {
           } else {
@@ -229,6 +384,7 @@ class _QuizHandlerState extends State<QuizHandler> {
           }
           if (!isEnter) {
             if (globals.userData!.tickets > 0) {
+              quizLoad();
               if (snapshot.data!['state'] == "completed") {
                 return Align(
                   alignment: Alignment.center,
@@ -246,7 +402,7 @@ class _QuizHandlerState extends State<QuizHandler> {
                           child: Text(
                             "Başla",
                             style: _textStyle.apply(
-                              color: HexColor().getColor("#03fcc2"),
+                              color: AppColors().allPointColor,
                               fontSizeDelta: 15,
                               fontWeightDelta: 2,
                               shadows: [
@@ -329,9 +485,15 @@ class _QuizHandlerState extends State<QuizHandler> {
               ),
             );
           }
-        } else {
-          return Container();
         }
+
+        return Align(
+          alignment: Alignment.center,
+          child: Text(
+            "Bağlantı kuruluyor.",
+            style: _textStyle,
+          ),
+        );
       },
     );
   }

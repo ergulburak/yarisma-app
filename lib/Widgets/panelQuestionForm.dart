@@ -36,12 +36,16 @@ class PanelQuestionForm extends StatelessWidget {
       child: Container(
         width: _width,
         decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.blueAccent,
+            width: 2,
+          ),
           color: Colors.white,
           borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(5),
-              topRight: Radius.circular(5),
-              bottomLeft: Radius.circular(5),
-              bottomRight: Radius.circular(5)),
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+              bottomLeft: Radius.circular(15),
+              bottomRight: Radius.circular(15)),
         ),
         child: Column(
           children: [
@@ -166,8 +170,7 @@ class PanelQuestionForm extends StatelessWidget {
                                                   TextInputType.visiblePassword,
                                               validator: qValidator([
                                                 IsRequired(
-                                                    msg:
-                                                        "Hafta Numarası girmelisiniz."),
+                                                    "Hafta Numarası girmelisiniz."),
                                               ]),
                                               style: _textStyle.apply(
                                                   color: Colors.black),
@@ -205,8 +208,7 @@ class PanelQuestionForm extends StatelessWidget {
                                               keyboardType:
                                                   TextInputType.visiblePassword,
                                               validator: qValidator([
-                                                IsRequired(
-                                                    msg: "Yıl girmelisiniz."),
+                                                IsRequired("Yıl girmelisiniz."),
                                               ]),
                                               style: _textStyle.apply(
                                                   color: Colors.black),

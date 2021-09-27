@@ -30,15 +30,20 @@ class PanelPendingQuestions extends StatelessWidget {
                     itemCount: snapshot.data!.docs.length,
                     itemBuilder: (context, index) {
                       return PanelQuestionForm(
-                        question:
-                            snapshot.data!.docs[index].data()!['question'],
-                        optionA: snapshot.data!.docs[index].data()!['optionA'],
-                        optionB: snapshot.data!.docs[index].data()!['optionB'],
-                        optionC: snapshot.data!.docs[index].data()!['optionC'],
-                        optionD: snapshot.data!.docs[index].data()!['optionD'],
-                        correctOption:
-                            snapshot.data!.docs[index].data()!['correctOption'],
-                        point: snapshot.data!.docs[index].data()!['point'],
+                        question: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['question'],
+                        optionA: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['optionA'],
+                        optionB: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['optionB'],
+                        optionC: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['optionC'],
+                        optionD: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['optionD'],
+                        correctOption: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['correctOption'],
+                        point: (snapshot.data!.docs[index].data()
+                            as Map<String, dynamic>)['point'],
                         docID: snapshot.data!.docs[index].reference.id,
                       );
                     },

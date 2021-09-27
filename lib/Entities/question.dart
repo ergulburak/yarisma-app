@@ -30,7 +30,7 @@ class Question {
   }
 
   factory Question.fromFirestore(DocumentSnapshot documentSnapshot) {
-    return Question.fromJson(documentSnapshot.data()!);
+    return Question.fromJson(documentSnapshot.data() as Map<String, dynamic>);
   }
 
   toJson() {
