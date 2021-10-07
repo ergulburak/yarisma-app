@@ -57,12 +57,12 @@ class _KarsilamaState extends State<Karsilama> {
   Widget build(BuildContext context) {
     TextStyle _googleFonts = GoogleFonts.robotoMono(
         color: Colors.white, fontSize: 17, fontWeight: FontWeight.normal);
-    Upgrader().clearSavedSettings();
     return Scaffold(
       backgroundColor: Colors.black,
       body: UpgradeAlert(
         showIgnore: false,
         showLater: false,
+        canDismissDialog: false,
         child: Center(
           child: Stack(
             children: [

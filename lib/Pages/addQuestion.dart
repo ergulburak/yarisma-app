@@ -26,10 +26,11 @@ class _AddQuestionState extends State<AddQuestion> {
   final _optionC = TextEditingController();
   final _optionD = TextEditingController();
   final _correctOption = TextEditingController();
-  final _point = TextEditingController();
   final TextStyle _textStyle = AppFont().getAppFont();
 
   String dropdownValue = 'A';
+
+  String dropdownPoint = '10';
 
   @override
   Widget build(BuildContext context) {
@@ -291,35 +292,64 @@ class _AddQuestionState extends State<AddQuestion> {
                 ),
               ),
               SizedBox(height: 20),
-              Align(
-                alignment: Alignment.center,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                  child: TextFormField(
-                    controller: _point,
-                    validator: qValidator([
-                      IsRequired("Puan"),
-                    ]),
-                    style: _textStyle.apply(color: Colors.black),
-                    decoration: InputDecoration(
-                      enabledBorder: const OutlineInputBorder(
-                          borderSide: const BorderSide(
-                              color: Colors.black, width: 0.5)),
-                      labelText: "Puan",
-                      labelStyle: _textStyle.apply(color: Colors.black),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.black,
-                          width: 2.0,
+              Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: Container(
+                  height: 60,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(2),
+                      border: Border.all(
+                        color: Colors.black,
+                      )),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: Text(
+                            "Puan : ",
+                            style: _textStyle,
+                          ),
                         ),
                       ),
-                      border: new OutlineInputBorder(
-                        borderSide: const BorderSide(
-                          color: Colors.black,
-                          width: 2.0,
+                      Expanded(
+                        flex: 1,
+                        child: Padding(
+                          padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                          child: DropdownButton<String>(
+                            value: dropdownPoint,
+                            icon: const Icon(
+                              Icons.arrow_downward,
+                              color: Colors.black,
+                            ),
+                            iconSize: 20,
+                            elevation: 16,
+                            dropdownColor: Colors.white,
+                            style: _textStyle,
+                            underline: Container(
+                              height: 2,
+                              color: Colors.black,
+                            ),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                dropdownPoint = newValue!;
+                              });
+                            },
+                            items: <String>['5', '10', '15']
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(
+                                  value,
+                                  style: _textStyle,
+                                ),
+                              );
+                            }).toList(),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ),
@@ -342,7 +372,7 @@ class _AddQuestionState extends State<AddQuestion> {
                                     : dropdownValue == "C"
                                         ? 3
                                         : 4,
-                            point: int.parse(_point.text));
+                            point: int.parse(dropdownPoint));
                         CollectionReference pendingQuestions = FirebaseFirestore
                             .instance
                             .collection("pendingQuestions");
@@ -375,7 +405,6 @@ class _AddQuestionState extends State<AddQuestion> {
                         _optionC.clear();
                         _optionD.clear();
                         _correctOption.clear();
-                        _point.clear();
                         widget.setHome(Screens.MYQUESTIONS);
                       }
                     },

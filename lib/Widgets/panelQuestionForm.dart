@@ -164,6 +164,9 @@ class PanelQuestionForm extends StatelessWidget {
                                               correctOption: correctOption,
                                               point: point,
                                             ),
+                                            SizedBox(
+                                              height: 10,
+                                            ),
                                             TextFormField(
                                               controller: _panelWeek,
                                               keyboardType:

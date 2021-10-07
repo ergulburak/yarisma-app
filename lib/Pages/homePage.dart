@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dot_navigation_bar/dot_navigation_bar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:upgrader/upgrader.dart';
 import 'package:yarisma_app/Entities/userData.dart';
 import 'package:yarisma_app/Pages/addQuestion.dart';
 import 'package:yarisma_app/Pages/leaderboardPage.dart';
@@ -39,6 +38,7 @@ class _HomePageState extends State<HomePage> {
 
   CollectionReference pendingQuestions =
       FirebaseFirestore.instance.collection("pendingQuestions");
+  CollectionReference allUsers = FirebaseFirestore.instance.collection("users");
 
   DocumentReference questionState = FirebaseFirestore.instance
       .collection("quizzes")
@@ -54,12 +54,12 @@ class _HomePageState extends State<HomePage> {
 
   Future<QuerySnapshot<Map<String, dynamic>>> leaderboardWeekPoints =
       FirebaseFirestore.instance
-          .collection("users")
-          .where("lastWeek",
+          .collection("weeklyScore")
+          .where("weekAndYear",
               isEqualTo: (CustomDateUtils.currentWeek() - 1).toString() +
                   "+" +
                   DateTime.now().year.toString())
-          .orderBy("weekScore", descending: true)
+          .orderBy("weeklyScore", descending: true)
           .limit(10)
           .get();
 
@@ -109,7 +109,10 @@ class _HomePageState extends State<HomePage> {
     else if (screens == Screens.ADDQUESTION)
       return AddQuestion(setHome: _update);
     else if (screens == Screens.PANEL)
-      return Panel(pendingQuestions: pendingQuestions);
+      return Panel(
+        pendingQuestions: pendingQuestions,
+        allUsers: allUsers,
+      );
   }
 
   void _update(Screens screen) {
@@ -129,7 +132,8 @@ class _HomePageState extends State<HomePage> {
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
         if (snapshot.hasData) {
-          globals.userData = new UserData.fromFirestore(snapshot.data!);
+          globals.userData = new UserData.fromJson(
+              snapshot.data!.data() as Map<String, dynamic>);
           setUserData();
         } else if (snapshot.hasError) {
           print("null geldi.");
@@ -321,7 +325,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             else
-              Container(),
+              CircularProgressIndicator(),
           ],
         ),
       ),
@@ -457,7 +461,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             else
-              Container(),
+              CircularProgressIndicator(),
           ],
         ),
       ),

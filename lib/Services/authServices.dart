@@ -39,7 +39,10 @@ class AuthService {
       UserCredential userCredential = await _firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: pass);
       _user = (_firebaseAuth.currentUser)!;
-      updateProfile(displayName: nickname);
+      updateProfile(
+        displayName: nickname,
+        email: email,
+      );
       return true;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
@@ -89,15 +92,19 @@ class AuthService {
     }
   }
 
-  Future<void> updateProfile({required String displayName}) async {
+  Future<void> updateProfile({
+    required String displayName,
+    required String email,
+  }) async {
     await _user.updateDisplayName(displayName);
     CollectionReference users = FirebaseFirestore.instance.collection("users");
     globals.userData = new UserData(
         uid: _user.uid,
         nickname: displayName,
+        mailAdress: email,
         allTrueAnswers: 0,
         allWrongAnswers: 0,
-        tickets: 0,
+        tickets: 1,
         joker: 1,
         rank: "user",
         totalScore: 0,

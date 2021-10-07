@@ -280,248 +280,240 @@ class _LoginEkraniState extends State<LoginEkrani> {
         ),
         Form(
           key: formKey2,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text("Kayıt",
-                        style: _googleFonts.apply(
-                            color: Colors.white,
-                            fontSizeDelta: 10,
-                            fontWeightDelta: 2)),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: TextFormField(
-                      controller: _adSoyadKayit,
-                      validator: qValidator([
-                        IsRequired("Nickname'inizi giriniz."),
-                        MinLength(3, "En az 3 karakter olmalıdır."),
-                      ]),
-                      style: _googleFonts.apply(color: Colors.white),
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: Colors.white, width: 0.5)),
-                        labelText: "Nickname",
-                        labelStyle: _googleFonts.apply(color: Colors.white),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
-                        border: new OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: <
+              Widget>[
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text("Kayıt",
+                    style: _googleFonts.apply(
+                        color: Colors.white,
+                        fontSizeDelta: 10,
+                        fontWeightDelta: 2)),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: TextFormField(
+                  controller: _adSoyadKayit,
+                  validator: qValidator([
+                    IsRequired("Nickname'inizi giriniz."),
+                    MinLength(3, "En az 3 karakter olmalıdır."),
+                  ]),
+                  style: _googleFonts.apply(color: Colors.white),
+                  decoration: InputDecoration(
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 0.5)),
+                    labelText: "Nickname",
+                    labelStyle: _googleFonts.apply(color: Colors.white),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
+                      ),
+                    ),
+                    border: new OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: TextFormField(
-                      controller: _emailKayit,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: qValidator([
-                        IsRequired("Email Giriniz."),
-                        IsEmail("Geçersiz email.")
-                      ]),
-                      style: _googleFonts.apply(color: Colors.white),
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: Colors.white, width: 0.5)),
-                        labelText: "Email",
-                        labelStyle: _googleFonts.apply(color: Colors.white),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
-                        border: new OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: TextFormField(
+                  controller: _emailKayit,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: qValidator([
+                    IsRequired("Email Giriniz."),
+                    IsEmail("Geçersiz email.")
+                  ]),
+                  style: _googleFonts.apply(color: Colors.white),
+                  decoration: InputDecoration(
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 0.5)),
+                    labelText: "Email",
+                    labelStyle: _googleFonts.apply(color: Colors.white),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
+                      ),
+                    ),
+                    border: new OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: TextFormField(
-                      controller: _passwordKayit,
-                      keyboardType: TextInputType.visiblePassword,
-                      validator: qValidator([
-                        IsRequired("Şifre giriniz."),
-                        MinLength(8, "En az 8 karakter olmalıdır."),
-                        MaxLength(16, "En fazla 16 karakter olmalıdır."),
-                        RegExpRule(
-                            RegExp(
-                                r'^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)'),
-                            "Şifrenizde harf ve rakam bulunması gerekir.\nÖrneğin:'Deneme123'"),
-                        Match(_passwordKontrolKayit.text)
-                      ]),
-                      style: _googleFonts.apply(color: Colors.white),
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: Colors.white, width: 0.5)),
-                        labelText: "Şifre",
-                        labelStyle: _googleFonts.apply(color: Colors.white),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
-                        border: new OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: TextFormField(
+                  controller: _passwordKayit,
+                  keyboardType: TextInputType.visiblePassword,
+                  validator: qValidator([
+                    IsRequired("Şifre giriniz."),
+                    MinLength(8, "En az 8 karakter olmalıdır."),
+                    MaxLength(16, "En fazla 16 karakter olmalıdır."),
+                    RegExpRule(
+                        RegExp(r'^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)'),
+                        "Şifrenizde harf ve rakam bulunması gerekir.\nÖrneğin:'Deneme123'"),
+                  ]),
+                  style: _googleFonts.apply(color: Colors.white),
+                  decoration: InputDecoration(
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 0.5)),
+                    labelText: "Şifre",
+                    labelStyle: _googleFonts.apply(color: Colors.white),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
+                      ),
+                    ),
+                    border: new OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Padding(
-                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                    child: TextFormField(
-                      controller: _passwordKontrolKayit,
-                      keyboardType: TextInputType.visiblePassword,
-                      validator: qValidator([
-                        IsRequired("Şifre giriniz."),
-                        MinLength(8, "En az 8 karakter olmalıdır."),
-                        MaxLength(16, "En fazla 16 karakter olmalıdır."),
-                        RegExpRule(
-                            RegExp(
-                                r'^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)'),
-                            "Şifrenizde harf ve rakam bulunması gerekir."),
-                        Match(_passwordKayit.text)
-                      ]),
-                      style: _googleFonts.apply(color: Colors.white),
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: const BorderSide(
-                                color: Colors.white, width: 0.5)),
-                        labelText: "Şifre Kontrol",
-                        labelStyle: _googleFonts.apply(color: Colors.white),
-                        focusedBorder: OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
-                        border: new OutlineInputBorder(
-                          borderSide: const BorderSide(
-                            color: Colors.white,
-                            width: 2.0,
-                          ),
-                        ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: Padding(
+                padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                child: TextFormField(
+                  controller: _passwordKontrolKayit,
+                  keyboardType: TextInputType.visiblePassword,
+                  validator: qValidator([
+                    IsRequired("Şifre giriniz."),
+                    MinLength(8, "En az 8 karakter olmalıdır."),
+                    MaxLength(16, "En fazla 16 karakter olmalıdır."),
+                    RegExpRule(
+                        RegExp(r'^(?=.*[0-9])(?=.*[a-zA-Z])([a-zA-Z0-9]+)'),
+                        "Şifrenizde harf ve rakam bulunması gerekir."),
+                  ]),
+                  style: _googleFonts.apply(color: Colors.white),
+                  decoration: InputDecoration(
+                    enabledBorder: const OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 0.5)),
+                    labelText: "Şifre Kontrol",
+                    labelStyle: _googleFonts.apply(color: Colors.white),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
+                      ),
+                    ),
+                    border: new OutlineInputBorder(
+                      borderSide: const BorderSide(
+                        color: Colors.white,
+                        width: 2.0,
                       ),
                     ),
                   ),
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
-                          child: InkWell(
-                              onTap: () {
-                                _authMode = AuthMode.LOGIN;
-                                _height = globals.telefonHeight! * 0.45;
-                                setState(() {});
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(15),
-                                      topRight: Radius.circular(15),
-                                      bottomLeft: Radius.circular(15),
-                                      bottomRight: Radius.circular(15)),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    "Geri",
-                                    style: _googleFonts.apply(
-                                        color: Colors.white,
-                                        fontSizeDelta: 3),
-                                  ),
-                                ),
-                              )),
-                        ),
-                        SizedBox(
-                          width: 100,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
-                          child: InkWell(
-                              onTap: () {
-                                if (formKey2.currentState!.validate())
-                                  submit();
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(5),
-                                      topRight: Radius.circular(5),
-                                      bottomLeft: Radius.circular(5),
-                                      bottomRight: Radius.circular(5)),
-                                ),
-                                child: Padding(
-                                  padding: EdgeInsets.all(10),
-                                  child: Text(
-                                    "Giriş Yap",
-                                    style: _googleFonts.apply(
-                                        color: Colors.black,
-                                        fontSizeDelta: 6),
-                                  ),
-                                ),
-                              )),
-                        ),
-                      ]),
-                ),
-                SizedBox(height: 20)
-              ]),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                      child: InkWell(
+                          onTap: () {
+                            _authMode = AuthMode.LOGIN;
+                            _height = globals.telefonHeight! * 0.45;
+                            setState(() {});
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                  bottomLeft: Radius.circular(15),
+                                  bottomRight: Radius.circular(15)),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                "Geri",
+                                style: _googleFonts.apply(
+                                    color: Colors.white, fontSizeDelta: 3),
+                              ),
+                            ),
+                          )),
+                    ),
+                    SizedBox(
+                      width: 100,
+                    ),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(0, 0, 20, 0),
+                      child: InkWell(
+                          onTap: () {
+                            if (formKey2.currentState!.validate()) submit();
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(5),
+                                  topRight: Radius.circular(5),
+                                  bottomLeft: Radius.circular(5),
+                                  bottomRight: Radius.circular(5)),
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(10),
+                              child: Text(
+                                "Giriş Yap",
+                                style: _googleFonts.apply(
+                                    color: Colors.black, fontSizeDelta: 6),
+                              ),
+                            ),
+                          )),
+                    ),
+                  ]),
+            ),
+            SizedBox(height: 20)
+          ]),
         ),
       ]),
     );
@@ -560,8 +552,8 @@ class _LoginEkraniState extends State<LoginEkrani> {
                   style: _googleFonts.apply(color: Colors.white),
                   decoration: InputDecoration(
                     enabledBorder: const OutlineInputBorder(
-                        borderSide: const BorderSide(
-                            color: Colors.white, width: 0.5)),
+                        borderSide:
+                            const BorderSide(color: Colors.white, width: 0.5)),
                     labelText: "Email",
                     labelStyle: _googleFonts.apply(color: Colors.white),
                     focusedBorder: OutlineInputBorder(

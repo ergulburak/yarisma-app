@@ -42,7 +42,7 @@ class _AskQuestionState extends State<AskQuestion> {
   List<int> jokerList = <int>[];
 
   double standbyTime = 0.0;
-  double questionWaitingTime = 500;
+  double questionWaitingTime = 30;
   static const oneSec = const Duration(seconds: 1);
 
   bool isJokerUsed = false;

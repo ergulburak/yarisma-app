@@ -68,7 +68,35 @@ class _QuizHandlerState extends State<QuizHandler> {
 
   @override
   void dispose() {
-    _states = States.NULL;
+    if ((_states == States.COMPETITION || _states == States.COOLDOWN) &&
+        _quiz.questions.length > 1) {
+      FirebaseFirestore.instance
+          .collection("users")
+          .doc(globals.userCollectionID)
+          .update({
+            'scoreHandler': json.encode(globals.userData!.scoreHandler),
+            'tickets': globals.userData!.tickets,
+            'totalScore': globals.userData!.totalScore,
+            'allTrueAnswers': globals.userData!.allTrueAnswers,
+            'allWrongAnswers': globals.userData!.allWrongAnswers,
+            'weekScore': globals.scoreHandler!.point,
+            'lastWeek': globals.scoreHandler!.quizName
+          })
+          .then((value) => print("User Updated"))
+          .catchError((error) => print("Failed to update user: $error"));
+      FirebaseFirestore.instance
+          .collection("weeklyScore")
+          .add({
+            'nickname': globals.userData!.nickname,
+            'weekAndYear': globals.scoreHandler!.quizName,
+            'weeklyScore': globals.scoreHandler!.point,
+          })
+          .then((value) => print("User Updated"))
+          .catchError((error) => print("Failed to update user: $error"));
+      _states = States.NULL;
+    } else {
+      _states = States.NULL;
+    }
     super.dispose();
     _interstitialAd?.dispose();
   }
@@ -109,6 +137,15 @@ class _QuizHandlerState extends State<QuizHandler> {
                   'allWrongAnswers': globals.userData!.allWrongAnswers,
                   'weekScore': globals.scoreHandler!.point,
                   'lastWeek': globals.scoreHandler!.quizName
+                })
+                .then((value) => print("User Updated"))
+                .catchError((error) => print("Failed to update user: $error"));
+            FirebaseFirestore.instance
+                .collection("weeklyScore")
+                .add({
+                  'nickname': globals.userData!.nickname,
+                  'weekAndYear': globals.scoreHandler!.quizName,
+                  'weeklyScore': globals.scoreHandler!.point,
                 })
                 .then((value) => print("User Updated"))
                 .catchError((error) => print("Failed to update user: $error"));

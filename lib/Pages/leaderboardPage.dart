@@ -2,6 +2,7 @@ import 'package:buttons_tabbar/buttons_tabbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:yarisma_app/Entities/usersInfo.dart';
+import 'package:yarisma_app/Entities/weeklyScore.dart';
 import 'package:yarisma_app/Services/font.dart';
 
 class Leaderboard extends StatefulWidget {
@@ -22,7 +23,7 @@ class _LeaderboardState extends State<Leaderboard>
   TextStyle _textStyle = AppFont().getAppFont();
 
   late List<UsersInfo> _userDatas = <UsersInfo>[];
-  List<UsersInfo> _userWeekDatas = <UsersInfo>[];
+  List<WeeklyScore> _userWeekDatas = <WeeklyScore>[];
 
   @override
   void initState() {
@@ -34,8 +35,8 @@ class _LeaderboardState extends State<Leaderboard>
     });
     widget.leaderboardWeekPoints.then((value) {
       for (QueryDocumentSnapshot tempUser in value.docs) {
-        _userWeekDatas.add(
-            UsersInfo.forBoardWeek(tempUser.data() as Map<String, dynamic>));
+        _userWeekDatas
+            .add(WeeklyScore.fromJson(tempUser.data() as Map<String, dynamic>));
       }
     });
     super.initState();
@@ -87,7 +88,7 @@ class _LeaderboardState extends State<Leaderboard>
                   child: TabBarView(
                     children: [
                       listBar(context, _userDatas),
-                      listBar(context, _userWeekDatas),
+                      listBarWeek(context, _userWeekDatas),
                     ],
                   ),
                 ),
@@ -285,6 +286,206 @@ class _LeaderboardState extends State<Leaderboard>
                             ),
                             Text(
                               list[index].totalScore.toString(),
+                              style: _textStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+          }
+        });
+  }
+
+  Widget listBarWeek(BuildContext context, List<WeeklyScore> list) {
+    return ListView.builder(
+        itemCount: list.length,
+        itemBuilder: (BuildContext ctxt, int index) {
+          switch (index) {
+            case 0:
+              {
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          topRight: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5)),
+                    ),
+                    height: 100,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              (index + 1).toString() +
+                                  ") " +
+                                  list[index].nickname,
+                              style: _textStyle.apply(fontSizeDelta: 25),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              list[index].weeklyScore.toString(),
+                              style: _textStyle.apply(fontSizeDelta: 25),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            case 1:
+              {
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          topRight: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5)),
+                    ),
+                    height: 80,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              (index + 1).toString() +
+                                  ") " +
+                                  list[index].nickname,
+                              style: _textStyle.apply(fontSizeDelta: 20),
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              list[index].weeklyScore.toString(),
+                              style: _textStyle.apply(fontSizeDelta: 20),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            case 2:
+              {
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          topRight: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5)),
+                    ),
+                    height: 60,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            FittedBox(
+                              fit: BoxFit.fill,
+                              child: Text(
+                                (index + 1).toString() +
+                                    ") " +
+                                    list[index].nickname,
+                                style: _textStyle.apply(fontSizeDelta: 15),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              list[index].weeklyScore.toString(),
+                              style: _textStyle.apply(fontSizeDelta: 15),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            default:
+              {
+                return Padding(
+                  padding: EdgeInsets.fromLTRB(5, 5, 5, 0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.blueAccent,
+                        width: 2,
+                      ),
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(5),
+                          topRight: Radius.circular(5),
+                          bottomLeft: Radius.circular(5),
+                          bottomRight: Radius.circular(5)),
+                    ),
+                    height: 50,
+                    child: Padding(
+                      padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              (index + 1).toString() +
+                                  ") " +
+                                  list[index].nickname,
+                              style: _textStyle,
+                              textAlign: TextAlign.center,
+                            ),
+                            SizedBox(
+                              width: 20,
+                            ),
+                            Text(
+                              list[index].weeklyScore.toString(),
                               style: _textStyle,
                               textAlign: TextAlign.center,
                             ),
